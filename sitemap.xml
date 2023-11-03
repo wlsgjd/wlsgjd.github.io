@@ -9,28 +9,58 @@
 
 <url>
   <loc>https://cshelldll.github.io/</loc>
-  <lastmod>2023-11-01T01:14:00+00:00</lastmod>
+  <lastmod>2023-11-03T01:37:43+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
   <loc>https://cshelldll.github.io/categories/</loc>
-  <lastmod>2023-11-01T01:14:00+00:00</lastmod>
+  <lastmod>2023-11-03T01:37:43+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://cshelldll.github.io/tags/</loc>
-  <lastmod>2023-11-01T01:14:00+00:00</lastmod>
+  <lastmod>2023-11-03T01:37:43+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://cshelldll.github.io/archives/</loc>
-  <lastmod>2023-11-01T01:14:00+00:00</lastmod>
+  <lastmod>2023-11-03T01:37:43+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://cshelldll.github.io/about/</loc>
-  <lastmod>2023-11-01T01:14:00+00:00</lastmod>
+  <lastmod>2023-11-03T01:37:43+00:00</lastmod>
   <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://cshelldll.github.io/posts/CopyCert/</loc>
+  <lastmod>2023-11-03T01:37:43+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://cshelldll.github.io/tags/certificate/</loc>
+  <lastmod>2023-11-03T01:37:43+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://cshelldll.github.io/tags/pe/</loc>
+  <lastmod>2023-11-03T01:37:43+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://cshelldll.github.io/tags/security-directory/</loc>
+  <lastmod>2023-11-03T01:37:43+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://cshelldll.github.io/categories/windows/</loc>
+  <lastmod>2023-11-03T01:37:43+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://cshelldll.github.io/categories/analyze-report/</loc>
+  <lastmod>2023-11-03T01:37:43+00:00</lastmod>
+  <priority>0.64</priority>
 </url>
 
 
