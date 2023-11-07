@@ -22,16 +22,17 @@ TerminateProcess, Read/WriteProcessMemory, CreateRemoteThread 등 외부 프로�
 ## PspProcessOpen
 유저 레벨에서 OpenProcess를 실행하게 되면 커널 내부에서 다음과 같은 순서대로 PspProcessOpen이 호출되며 해당 함수를 통해 STATUS_ACCESS_DENIED(0xC0000022)를 반환합니다.
 ![](/assets/posts/2023-11-06-EProtection/4.png)
-| Ring | Call Stacks     |
-|:-:|--------------------|
-| 3 | OpenProcess        |
-| 3 | NtOpenProcess      |
-| 0 | NtOpenProcess    |
-| 0 | PsOpenProcess   |
-| 0 | ObOpenObjectByPointer   |
-| 0 | ObpCreateHandle |
+
+| Ring | Call Stacks            |
+|:-:|---------------------------|
+| 3 | OpenProcess               |
+| 3 | NtOpenProcess             |
+| 0 | NtOpenProcess             |
+| 0 | PsOpenProcess             |
+| 0 | ObOpenObjectByPointer     |
+| 0 | ObpCreateHandle           |
 | 0 | ObpIncrementHandleCountEx |
-| 0 | PspProcessOpen   |
+| 0 | PspProcessOpen            |
 
 ## PsTestProtectedProcessIncompatibility
 PspProcessOpen 함수 내부에서는 PsTestProtectedProcessIncompatibility를 통해 대상 프로세스가 보호 중인지 체크합니다. EPROCESS + 0x87A에 위치한 데이터를 통해 보호 여부를 확인합니다.
