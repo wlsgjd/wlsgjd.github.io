@@ -37,7 +37,7 @@ TerminateProcess, Read/WriteProcessMemory, CreateRemoteThread 등 외부 프로�
 PspProcessOpen 함수 내부에서는 PsTestProtectedProcessIncompatibility를 통해 대상 프로세스가 보호 중인지 체크합니다. EPROCESS + 0x87A에 위치한 데이터를 통해 보호 여부를 확인합니다.
 ![](/assets/posts/2023-11-06-EProtection/5.png)
 
-## EPROCESS Protection
+## EPROCESS
 해당 위치에는 Protection이라는 필드가 존재합니다. 해당 값에 따라 PsTestProtectedProcessIncompatibility의 호출 결과가 바뀌며 운영체제로부터 프로세스 보호가 적용됩니다.
 ```
 0: kd> dt_eprocess
