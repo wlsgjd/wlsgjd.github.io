@@ -27,7 +27,6 @@ TerminateProcess, Read/WriteProcessMemory, CreateRemoteThread 등 외부 프로�
 |:-:|---------------------------|
 | 3 | OpenProcess               |
 | 3 | NtOpenProcess             |
-| 0 | NtOpenProcess             |
 | 0 | PsOpenProcess             |
 | 0 | ObOpenObjectByPointer     |
 | 0 | ObpCreateHandle           |
