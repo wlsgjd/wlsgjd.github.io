@@ -30,7 +30,6 @@ TerminateProcess, Read/WriteProcessMemory, CreateRemoteThread 등 외부 프로�
 | 0 | PsOpenProcess                     |
 | 0 | ObOpenObjectByPointer             |
 | 0 | ObpCreateHandle                   |
-| 0 | ObpIncrementHandleCountEx         |
 | 0 | PspProcessOpen                    |
 
 ## PsTestProtectedProcessIncompatibility
@@ -38,7 +37,7 @@ PspProcessOpen 함수 내부에서는 PsTestProtectedProcessIncompatibility를 �
 ![](/assets/posts/2023-11-06-EProtection/5.png)
 
 ## EPROCESS
-해당 위치에는 Protection이라는 필드가 존재합니다. 해당 값에 따라 PsTestProtectedProcessIncompatibility의 호출 결과가 바뀌며 운영체제로부터 프로세스 보호가 적용됩니다.
+해당 위치(0x87A)에는 Protection이라는 필드가 존재합니다. 해당 값에 따라 PsTestProtectedProcessIncompatibility의 반환값이 바뀌며 운영체제로부터 프로세스 보호가 적용됩니다.
 ```
 0: kd> dt_eprocess
 nt!_EPROCESS
@@ -102,5 +101,8 @@ void Protect(PEPROCESS eprocess, BOOL bActive)
 	*protection = bActive ? 0x61 : 0x00;
 }
 ```
-작업관리자를 통해 종료를 시도 시, 보호가 적용된 것을 확인할 수 있습니다.
+작업관리자를 통해 종료를 시도 시, 보호가 적용된 것을 확인할 수 있습니다. 
 ![](/assets/posts/2023-11-06-EProtection/2.png)
+
+반대로 보호 중인 프로세스를 해제하려는 경우 해당 값을 0x00으로 변경하면 됩니다. 시스템 프로세스 또한 다음과 같이 보호가 해제되어 OpenProcess가 성공적으로 동작하였습니다.
+![](/assets/posts/2023-11-06-EProtection/6.png)
