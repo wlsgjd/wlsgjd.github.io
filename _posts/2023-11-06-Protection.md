@@ -1,16 +1,19 @@
 ---
 title: 프로세스 보호 (EPROCESS Protection)
-categories: [Windows, Analysis Report]
+categories: [Analysis Report]
 tags: [OpenProcess, EPROCESS, Protection, PsTestProtectedProcessIncompatibility]
 ---
 
 ## OpenProcess
+TerminateProcess, Read/WriteProcessMemory, CreateRemoteThread 등 외부 프로세스를 제어하기 위해서는 OpenProcess를 통한 핸들 획득이 필요합니다. 
 
 ## EPROCESS
 
 ## Protection
-분석한 내용을 바탕으로 해킹툴과 동일하게 동작하는 도구를 개발하였습니다. 실행 시 Winsock2 레지스트리를 추가하여 
 
 ## PsTestProtectedProcessIncompatibility
+OpenProcess 내부에서는 
 
 ## POC Code
+
+## csrss
