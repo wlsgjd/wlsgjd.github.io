@@ -5,7 +5,7 @@ tags: [DLL Injection, Global DLL Injection, Winsock2]
 ---
 
 ## Winsock2
-TEST
+TEST2
 
 ## POC Code
-TEST
+TEST2
