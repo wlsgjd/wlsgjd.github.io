@@ -5,7 +5,7 @@ tags: [PsLookupProcessByProcessId, PspReferenceCidTableEntry, ExpLookupHandleTab
 ---
 
 ## STATUS_INVALID_CID (0xC000000B)
-OpenProcess를 호출하면 다음과 같이 0xC000000B를 반환하며 실패하는 해킹툴이 발견되었습니다.
+OpenProcess를 호출하면 0xC000000B를 반환하며 실패하는 해킹툴이 발견되었습니다.
 ![](/assets/posts/2023-11-08-PspCidTable/1.png)
 
 다음과 같이 NtOpenProcess 시스콜 이후에 실패하고 있으며, 이를 봤을 때 커널 레벨에서 조작된 것을 추측할 수 있습니다.
@@ -64,7 +64,7 @@ ExpLookupHandleTableEntry를 통해 얻은 값을 쉬프트 연산자(SHR, 0x10)
 ![](/assets/posts/2023-11-08-PspCidTable/5.png)
 
 ## Kernel Memory Dump
-위에 확인된 내용들을 증명하기 위해 해킹툴이 적용된 환경에서 커널 메모리 덤프를 수집하여 추가로 분석을 진행하였습니다.
+위에 확인된 내용들을 바탕으로, 커널 메모리 덤프를 수집 후 해킹툴 분석을 추가로 진행하였습니다.
 
 먼저, 덤프에서 조작된 프로세스의 eprocess 주소와 pid를 구합니다.
 ```
@@ -127,6 +127,7 @@ nt!ExpLookupHandleTableEntry+0x65:
 fffff805`4c3f6325 33c0            xor     eax,eax
 fffff805`4c3f6327 c3              ret
 ```
+
 해당 코드를 순차적으로 계산하면 다음과 같습니다.
 ```
 0: kd> dqs nt!PspCidTable
@@ -162,7 +163,7 @@ rax : ffff8a09`97a57000
 
 rax+rdx*4 = ffff8a09`97a57140
 ```
-연산을 통해 획득한 PspCidTable 테이블 내 데이터를 확인하면 eprocess가 존재해야하는데 0으로 초기화되어 있습니다. 해킹툴에서 안티치트를 우회하기 위해 조작한 것을 확인할 수 있습니다.
+연산을 통해 획득한 PspCidTable 테이블 내 데이터를 확인하면 eprocess가 존재해야하는데 0으로 초기화되어 있습니다. 해킹툴에서 안티치트를 우회하기 위해 조작한 것으로 보입니다.
 ```
 0: kd> dqs ffff8a09`97a57140
 ffff8a09`97a57140  00000000`00000000 // dwm.exe => NULL
@@ -170,7 +171,7 @@ ffff8a09`97a57148  00000000`00000000
 ffff8a09`97a57150  9a815e11`8080b569
 ffff8a09`97a57158  00000000`00000000
 ```
-복원이 필요한 경우, 다음과 같이 SHR(0x10)과 반대로 eprocess 주소를 SHL(0x10)한 뒤에 0x01을 더하면 됩니다. 복원 시 PsLookupProcessByProcessId 및 OpenProcess가 정상적으로 동작합니다.
+다음과 같이 SHR(0x10)과 반대로 eprocess 주소를 SHL(0x10)한 뒤에 0x01을 더하면 복원이 가능합니다. 복원 시 PsLookupProcessByProcessId 및 OpenProcess가 정상적으로 동작합니다.
 ```
 0: kd> eq ffff8a09`97a57140 (ffff9a8164694300 << 0x10) + 0x01
 
@@ -267,7 +268,7 @@ Case 1.
 ffff8a09`97a57140  00000000`00000000 // 9a816469`43000001 => NULL
 ffff8a09`97a57148  00000000`00000000
 ```
-## Dummy Object
+## Dummy Process
 다음과 같이 더미 프로세스를 반환하는 경우엔 확인이 쉽지 않습니다. ActiveProcessLinks 등을 통해 획득한 원본 eprocess 주소와 pid를 비교해 확인이 가능합니다.
 ```
 0: kd> !process 0 0 dwm.exe
@@ -295,6 +296,8 @@ ntdll!_EPROCESS
 
 ## POC Code
 분석된 내용을 바탕으로 PspCidTable를 조작하는 도구를 개발하였습니다. 전체 소스코드는 [GitHub](https://github.com/cshelldll/MyPOC/tree/main/PCTSample)에 업로드 하였습니다.
+
+아래는 ntkrnlmp 내에서 PspCidTable을 찾는 코드입니다. Export 된 변수가 아니기 때문에 시그니처를 통해 스캔합니다.
 ```cpp
 ULONG64 SearchPspCidTable(ULONG64 pagestart, ULONG64 pageend) {
 	BYTE PspCidTableCode[] = { 0x66,0xFF,0x89,0xE6,0x01,0x00,0x00,0x49,0x8B,0xF0,0x48,0x8B,0xF9 };
@@ -310,7 +313,10 @@ ULONG64 SearchPspCidTable(ULONG64 pagestart, ULONG64 pageend) {
 	}
 	return Address;
 }
+```
 
+검색된 PspCidTable 내에서 PID가 참조하고 있는 위치를 0으로 초기화합니다. 이렇게 되면 EPROCESS 대신 NULL 값을 반환하여 프로세스 관련된 함수들이 정상적으로 동작하지 않습니다.
+```cpp
 unsigned __int64 ExpLookupHandleTableEntry(unsigned int* a1, __int64 a2)
 {
 	unsigned __int64 v2; // rdx
@@ -337,6 +343,25 @@ unsigned __int64 ExpLookupHandleTableEntry(unsigned int* a1, __int64 a2)
 	return v3 + 4 * v2;
 }
 
+VOID RemovePspCidTable(ULONG64 Pid) 
+{
+
+	ULONG64 PspCidTable = 0;
+
+	HideSearch(&PspCidTable);
+
+	if (PspCidTable == 0) {
+		KeBugCheckEx(0, 0, 0, 0, 0);
+	}
+
+	PULONG64 handle_table_entry = (PULONG64)ExpLookupHandleTableEntry((PVOID)PspCidTable, Pid);
+
+	*handle_table_entry = 0;
+}
+```
+
+또는 다음과 같이 더미 프로세스 주소를 넣으면 위장 또한 가능합니다.
+```cpp
 VOID RemovePspCidTable(ULONG64 Pid, ULONG64 eprocess) 
 {
 
@@ -351,6 +376,5 @@ VOID RemovePspCidTable(ULONG64 Pid, ULONG64 eprocess)
 	PULONG64 handle_table_entry = (PULONG64)ExpLookupHandleTableEntry((PVOID)PspCidTable, Pid);
 
 	*handle_table_entry = eprocess << 0x10 | 0x01;
-	*handle_table_entry = 0;
 }
 ```
