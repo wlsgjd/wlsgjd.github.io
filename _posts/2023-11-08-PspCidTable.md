@@ -171,7 +171,7 @@ ffff8a09`97a57148  00000000`00000000
 ffff8a09`97a57150  9a815e11`8080b569
 ffff8a09`97a57158  00000000`00000000
 ```
-다음과 같이 SHR(0x10)과 반대로 eprocess 주소를 SHL(0x10)한 뒤에 0x01을 더하면 복원이 가능합니다. 복원 시 PsLookupProcessByProcessId 및 OpenProcess가 정상적으로 동작합니다.
+다음과 같이 SHR(0x10)과 반대로 eprocess 주소를 SHL(0x10)한 뒤에 0x01을 더하면 복원이 가능합니다. 복원 시 PsLookupProcessByProcessId 및 OpenProcess 또한 정상적으로 동작합니다.
 ```
 0: kd> eq ffff8a09`97a57140 (ffff9a8164694300 << 0x10) + 0x01
 
@@ -344,7 +344,7 @@ unsigned __int64 ExpLookupHandleTableEntry(unsigned int* a1, __int64 a2)
 	return v3 + 4 * v2;
 }
 
-VOID RemovePspCidTable(ULONG64 Pid) 
+VOID SetPspCidTable(ULONG64 Pid) 
 {
 	ULONG64 PspCidTable = 0;
 
@@ -360,9 +360,9 @@ VOID RemovePspCidTable(ULONG64 Pid)
 }
 ```
 
-또는 다음과 같이 더미 프로세스 주소를 넣으면 위장 또한 가능합니다.
+또는 다음과 같이 프로세스 오브젝트를 넣어주면 다른 프로세스로 위장하거나, 원본 프로세스가 반환되도록 복원이 가능합니다.
 ```cpp
-VOID RemovePspCidTable(ULONG64 Pid, ULONG64 eprocess) 
+VOID SetPspCidTable(ULONG64 Pid, ULONG64 eprocess)
 {
 
 	ULONG64 PspCidTable = 0;
@@ -375,6 +375,50 @@ VOID RemovePspCidTable(ULONG64 Pid, ULONG64 eprocess)
 
 	PULONG64 handle_table_entry = (PULONG64)ExpLookupHandleTableEntry((PVOID)PspCidTable, Pid);
 
-	*handle_table_entry = eprocess << 0x10 | 0x01;
+	/* PspReferenceCidTableEntry
+	if ( !(unsigned __int8)ExLockHandleTableEntry(PspCidTable, v4) )
+	  return 0i64;
+
+	v11 = (struct _DMA_ADAPTER *)((*(__int64 *)v4 >> 0x10) & 0xFFFFFFFFFFFFFFF0ui64);
+	*/
+
+	/* windbg dump
+	2: kd> $$>a< C:\scripts\CheckPspCidTable 100
+	Case 1.
+	ffffe30d`a8ab0060  a48a7bb3`90400001
+
+	a48a7bb3`90400001 >> 0x10 = EPROCESS
+	EPROCESS << 0x10 | 0x01 = a48a7bb3`90400001
+	*/
+
+	if (eprocess)
+		*handle_table_entry = eprocess << 0x10 | 0x01;
+	else
+		*handle_table_entry = 0;
+}
+
+NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPat)
+{
+	UNREFERENCED_PARAMETER(DriverObject);
+	UNREFERENCED_PARAMETER(RegistryPat);
+
+	PEPROCESS eprocess;
+	HANDLE pid;
+	if (FindProcessByName("dwm.exe", &eprocess))
+	{
+		pid = GetProcessId(eprocess);
+
+		DbgPrint("PID : %d\n", pid);
+		DbgPrint("EPROCESS : 0x%p\n", eprocess);
+
+		// Dummy Process
+		PEPROCESS dummy_process;
+		SetPspCidTable((ULONG64)pid, (ULONG64)dummy_process);
+
+		// Original Process
+		PEPROCESS original_process;
+		SetPspCidTable((ULONG64)pid, (ULONG64)original_process);
+	}
+	return STATUS_UNSUCCESSFUL;
 }
 ```
