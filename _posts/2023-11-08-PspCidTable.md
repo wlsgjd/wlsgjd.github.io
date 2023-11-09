@@ -6,10 +6,10 @@ tags: [PsLookupProcessByProcessId, PspReferenceCidTableEntry, ExpLookupHandleTab
 
 ## STATUS_INVALID_CID (0xC000000B)
 OpenProcess를 호출하면 다음과 같이 0xC000000B를 반환하며 실패하는 해킹툴이 발견되었습니다.
-![](/assets/posts//2023-11-08-PspCidTable/1.png)
+![](/assets/posts/2023-11-08-PspCidTable/1.png)
 
 다음과 같이 NtOpenProcess syscall 이후에 실패된 것으로 보아, 커널 레벨에서 조작된 것을 추측할 수 있습니다.
-![](/assets/posts//2023-11-08-PspCidTable/2.png)
+![](/assets/posts/2023-11-08-PspCidTable/2.png)
 
 해당 값은 [MS-ERREF](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/596a1078-e883-4972-9bbc-49e60bebca55) 문서에 나와있는데 클라이언트 ID가 잘못되었음을 나타냅니다. 해당 내용만 봐서는 딱히 짐작이 되질 않습니다.
 
@@ -19,7 +19,7 @@ OpenProcess를 호출하면 다음과 같이 0xC000000B를 반환하며 실패�
 
 ## PsLookupProcessByProcessId
 유저 레벨에서 OpenProcess를 호출할 경우, 커널 내부에서 PsLookupProcessByProcessId를 호출하게 됩니다. 해당 함수에서는 실패 시 STATUS_INVALID_CID를 리턴하고 있습니다.
-![](/assets/posts//2023-11-08-PspCidTable/3.png)
+![](/assets/posts/2023-11-08-PspCidTable/3.png)
 
 호출 스택은 다음과 같이 정리할 수 있습니다.
 
@@ -42,7 +42,7 @@ PsLookupProcessByProcessId 내부에서는 PspReferenceCidTableEntry라는 함�
 
 ## ExpLookupHandleTableEntry
 ExpLookupHandleTableEntry 함수는 PspCidTable이라는 프로세스 오브젝트 테이블을 전달 받으며, 특정한 연산을 통해 PID를 기반으로 인덱스를 생성하고 데이터를 반환합니다. 해시 테이블과 비슷한 개념이라고 생각하면 될 것 같습니다.
-![](/assets/posts//2023-11-08-PspCidTable/4.png)
+![](/assets/posts/2023-11-08-PspCidTable/4.png)
 
 일반적인 경우에 내부 연산은 다음과 같습니다.
 ```cpp
