@@ -271,7 +271,7 @@ ffff8a09`97a57148  00000000`00000000
 ```
 
 ## Dummy Process
-다음과 같이 더미 프로세스를 반환하는 경우엔 확인이 쉽지 않습니다. ActiveProcessLinks 등을 통해 획득한 원본 eprocess 주소와 pid를 비교해 확인이 가능합니다.
+다음과 같이 더미 프로세스를 반환하도록 조작되면 확인이 쉽지 않습니다. ActiveProcessLinks 등을 통해 획득한 원본 eprocess 주소와 pid를 비교해 확인이 가능합니다.
 ```
 0: kd> !process 0 0 dwm.exe
 PROCESS ffff9a8164694300
