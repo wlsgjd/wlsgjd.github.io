@@ -4,5 +4,5 @@ icon: fas fa-info-circle
 order: 4
 ---
 
-## Profile:
+## Profile
 EMail: cshelldll@naver.com
