@@ -259,6 +259,7 @@ Case 1.
 ffff8a09`934b4ca0  9a8163e1`4140acc1
 ffff8a09`934b4ca8  00000000`00000000
 ```
+
 ## Null Object
 해킹툴이 적용된 프로세스의 경우, 다음과 같이 테이블이 조작되어 null 또는 다른 프로세스 오브젝트를 반환하는 경우가 존재합니다. NULL 값으로 조작된 경우에는 비교적 빠르게 확인이 가능합니다.
 ```
@@ -268,6 +269,7 @@ Case 1.
 ffff8a09`97a57140  00000000`00000000 // 9a816469`43000001 => NULL
 ffff8a09`97a57148  00000000`00000000
 ```
+
 ## Dummy Process
 다음과 같이 더미 프로세스를 반환하는 경우엔 확인이 쉽지 않습니다. ActiveProcessLinks 등을 통해 획득한 원본 eprocess 주소와 pid를 비교해 확인이 가능합니다.
 ```
@@ -292,7 +294,6 @@ ntdll!_EPROCESS
    +0x440 UniqueProcessId  : 0x00000000`00000328 Void
       +0x5a8 ImageFileName    : [15]  "dummy.exe"
 ```
-
 
 ## POC Code
 분석된 내용을 바탕으로 PspCidTable를 조작하는 도구를 개발하였습니다. 전체 소스코드는 [GitHub](https://github.com/cshelldll/MyPOC/tree/main/PCTSample)에 업로드 하였습니다.
@@ -345,7 +346,6 @@ unsigned __int64 ExpLookupHandleTableEntry(unsigned int* a1, __int64 a2)
 
 VOID RemovePspCidTable(ULONG64 Pid) 
 {
-
 	ULONG64 PspCidTable = 0;
 
 	HideSearch(&PspCidTable);
