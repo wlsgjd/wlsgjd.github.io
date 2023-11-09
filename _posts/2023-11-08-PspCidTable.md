@@ -56,8 +56,8 @@ PspReferenceCidTableEntry는 ExpLookupHandleTableEntry에서 전달받은 값을
 ## Kernel Memory Dump
 위에서 분석된 내용들을 증명하기 위해 해킹툴이 적용된 환경에서 커널 메모리 덤프를 수집하여 추가로 진행하였습니다.
 
-
 ## Windbg Script
+TEST
 
 ## POC Code
 분석된 내용을 바탕으로 PspCidTable를 조작하는 도구를 개발하였습니다. 전체 소스코드는 [GitHub](https://github.com/cshelldll/MyPOC/tree/main/PCTSample)에 업로드 하였습니다.
