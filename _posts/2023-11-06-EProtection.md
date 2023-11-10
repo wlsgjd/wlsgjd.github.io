@@ -1,7 +1,7 @@
 ---
 title: 프로세스 보호 (EPROCESS Protection)
 categories: [Analysis Report]
-tags: [OpenProcess, EPROCESS, Protection, PspProcessOpen, ObOpenObjectByPointer, PsTestProtectedProcessIncompatibility]
+tags: [Windows Kernel]
 ---
 
 ## OpenProcess

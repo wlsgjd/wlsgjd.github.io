@@ -1,7 +1,7 @@
 ---
 title: 프로세스 보호 (PspCidTable)
 categories: [Analysis Report]
-tags: [PsLookupProcessByProcessId, PspReferenceCidTableEntry, ExpLookupHandleTableEntry, PspCidTable, EPROCESS, OpenProcess]
+tags: [Windows Kernel]
 ---
 
 ## STATUS_INVALID_CID (0xC000000B)
