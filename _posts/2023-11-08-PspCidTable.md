@@ -422,3 +422,5 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPat)
 	return STATUS_UNSUCCESSFUL;
 }
 ```
+작업관리자를 통해 종료를 시도 시, 보호가 적용된 것을 확인할 수 있습니다. 
+![](/assets/posts/2023-11-08-PspCidTable/6.png)
