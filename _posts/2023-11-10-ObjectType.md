@@ -1,6 +1,6 @@
 ---
 title: 프로세스 보호 (ObjectType)
-categories: [Analysis Report]
+categories: [HackTool Analysis Report]
 tags: [Windows Kernel]
 ---
 
