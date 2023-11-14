@@ -1,5 +1,5 @@
 ---
-title: 프로세스 보호 (EPROCESS Protection)
+title: 프로세스 보호 (Protection)
 categories: [HackTool Analysis Report]
 tags: [Windows Kernel]
 ---
