@@ -5,7 +5,7 @@ tags: [Windows Kernel]
 ---
 
 ## STATUS_OBJECT_TYPE_MISMATCH (C0000024)
-OpenProcess를 호출하면 0xC000000B를 반환하며 실패하는 해킹툴이 발견되었습니다. 
+OpenProcess를 호출하면 0xC0000024를 반환하며 실패하는 해킹툴이 발견되었습니다. 
 
 다음과 같이 NtOpenProcess 시스콜 이후에 실패하고 있으며, 이를 봤을 때 커널 레벨에서 조작된 것을 추측할 수 있습니다.
 ![](/assets/posts/2023-11-10-ObjectType/1.png)
@@ -50,7 +50,7 @@ Object: ffffbc015b7550c0  Type: (ffffbc0155ae3bc0) Process
 | 0 | ObOpenObjectByPointer             |
 | 0 | ObReferenceObjectByPointerWithTag |
 
-ObHeaderCookie, TypeIndex, 오브젝트 헤더의 주소 값을 xor 연산하여 인덱스 값을 생성하고 ObTypeIndexTable 내에서 해당 Object_type 데이터를 가져와 비교합니다.
+ObHeaderCookie, TypeIndex, 오브젝트 헤더의 주소 값을 xor 연산하여 인덱스 값을 생성하고 ObTypeIndexTable 내에서 OBJECT_TYPE 데이터를 가져와 비교합니다.
 ![](/assets/posts/2023-11-10-ObjectType/2.png)
 
 현재 수집된 해킹툴 덤프에서는 다음과 같은 연산을 통해 ObTypeIndexTable에 참조하는 인덱스 값이 0x07=>0x06으로 조작된 것을 확인할 수 있습니다.
@@ -85,7 +85,7 @@ fffff805`74cfceb8  ffffbc01`55af32a0 // PsProcessType
 3. ObjectHeader->TypeIndex
 4. Object Memory Reallocation
 
-인덱스를 구하는 계산식을 C++ 형태로 정리하면 대충 다음과 같습니다.
+OpenProcess를 호출했을 때, 커널 내부에서 ObjectType을 비교하는 방식을 C++ 코드 형태로 정리하면 대충 다음과 같습니다. 해당 함수를 통해 대상 오브젝트가 PsProcessType인지 검사합니다.
 ```cpp
 BYTE ObHeaderCookie;
 OBJECT_TYPE ObTypeIndexTable[];
@@ -427,7 +427,7 @@ nt!_OBJECT_TYPE
 분석한 내용을 바탕으로 해킹툴과 동일하게 동작하는 코드를 개발하였습니다.
 전체 소스코드는 [GitHub](https://github.com/cshelldll/MyPOC/tree/main/ProcessObjType)에 업로드하였습니다.
 
-시스템 프로세스의 오브젝트 타입이 OBJECT_TYPE_PROCESS 고정인 것을 이용하여 역연산을 통해 ObHeaderCookie 값을 획득하고, 해당 값을 통해 대상 프로세스의 오브젝트 타입을 변경합니다.
+시스템 프로세스의 오브젝트 타입이 OBJECT_TYPE_PROCESS 고정인 것을 이용하여 역연산을 통해 ObHeaderCookie 값을 획득하고, 해당 값을 통해 대상 프로세스의 TypeIndex를 변경합니다.
 
 ```cpp
 BOOL GetObHeaderCookie(BYTE* ObHeaderCookie)
