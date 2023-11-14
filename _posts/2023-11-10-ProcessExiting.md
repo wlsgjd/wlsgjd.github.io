@@ -1,5 +1,5 @@
 ---
-title: 스레드 생성 보호 (ProcessExiting)
+title: 프로세스 종료 위장 (ProcessExiting)
 categories: [HackTool Analysis Report]
 tags: [Windows Kernel]
 ---
@@ -17,7 +17,7 @@ tags: [Windows Kernel]
 ## EPROCSS
 해킹툴은 종료되지 않고 정상적으로 실행되고 있습니다. 이러한 오류를 반환하는 것으로 봐서는 커널 레벨에서 프로세스가 마치 종료된 것처럼 보이게 조작한 것으로 추측됩니다.
 
-EPROCESS에는 다양한 정보들이 저장되어 있습니다. 이 중에서 flags라는 필드에는 프로세스가 종료됐는지에 대한 플래그 값이 존재합니다. 해당 값은 TerminateProcess, ExitProcess 등 실행 중인 프로세스가 종료될 때 활성화됩니다. 
+EPROCESS에는 다양한 정보들이 저장되어 있습니다. 이 중에서 flags라는 필드에는 프로세스가 종료됐는지에 대한 플래그 값이 존재합니다. 해당 값은 NtTerminateProcess를 통해 실행 중인 프로세스가 종료될 때 활성화됩니다. 
 ```
 6: kd> dt_eprocess
 ntdll!_EPROCESS
@@ -104,10 +104,12 @@ ntdll!_EPROCESS
 ```
 
 ## NtTerminateProcess
-유저 레벨에서 ExitProcess를 호출하는 경우, 커널 내부에서 NtTerminateProcess가 호출됩니다. 해당 함수에서는 다음과 같이 flags와 ExitStatus 값을 초기화하여 프로세스가 종료 중이라는 것을 나타냅니다. 그 후에 PspTerminateAllThreads를 통해 실행 중인 모든 스레드를 종료합니다.
+유저 레벨에서 ExitProcess를 호출하는 경우, 커널 내부에서 NtTerminateProcess가 호출됩니다. 
+
+해당 함수에서는 다음과 같이 flags와 ExitStatus 값을 초기화하여 프로세스가 종료 중이라는 것을 나타냅니다. 
 ![](/assets/posts/2023-11-10-ProcessExiting/4.png)
 
-해당 함수의 호출 스택은 다음과 같습니다.
+ProcessDelete, ProcessSelfDelete이 활성화되면 PspTerminateAllThreads를 통해 실행 중인 모든 스레드를 종료합니다. 해당 함수의 호출 스택은 다음과 같습니다.
 
 | Ring | Call Stacks                    |
 |:-:|-----------------------------------|
@@ -115,6 +117,7 @@ ntdll!_EPROCESS
 | 3 | RtlExitUserProcess                |
 | 3 | NtTerminateProcess                |
 | 0 | NtTerminateProcess                |
+| 0 | PspTerminateAllThreads            |
 
 해당 해킹툴은 이 과정에서 초기화되는 flags와 동일하게 값을 변조하여 마치 프로세스가 중료 중 또는 이미 종료된 것처럼 보이게 조작하였습니다. 
 

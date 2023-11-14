@@ -1,5 +1,5 @@
 ---
-title: 프로세스 보호 (PspCidTable)
+title: 오브젝트 테이블 변조 (PspCidTable)
 categories: [HackTool Analysis Report]
 tags: [Windows Kernel]
 ---
