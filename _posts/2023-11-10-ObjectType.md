@@ -79,7 +79,8 @@ fffff805`74cfceb0  ffffbc01`55ae3bc0 // PsJobType
 fffff805`74cfceb8  ffffbc01`55af32a0 // PsProcessType
 ```
 
-해당 인덱스 값을 변조하려면 다음과 같이 4가지 방법이 존재하는데 1,2,4는 변경 시 다른 오브젝트에도 영향이 가거나 방법이 매우 까다롭기 때문에 사실상 ObjectHeader->TypeIndex를 통한 변조만 가능할 것 같다고 생각됩니다. 이를 통해 핵툴에서 해당 부분을 변조했다고 추측할 수 있습니다.
+## TypeIndex
+ObTypeIndexTable를 참조하는 인덱스 값을 변조하려면 다음과 같이 4가지 방법이 존재하는데 1,2,4는 변경 시 다른 오브젝트에도 영향이 가거나 방법이 매우 까다롭기 때문에 사실상 ObjectHeader->TypeIndex를 통한 변조만 가능할 것 같다고 생각됩니다.
 1. ObTypeIndexTable
 2. ObHeaderCookie
 3. ObjectHeader->TypeIndex
