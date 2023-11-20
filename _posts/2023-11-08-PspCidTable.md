@@ -1,6 +1,6 @@
 ---
 title: 오브젝트 테이블 변조 (PspCidTable)
-categories: [HackTool Analysis Report]
+categories: [Analysis Report]
 tags: [Windows Kernel]
 ---
 

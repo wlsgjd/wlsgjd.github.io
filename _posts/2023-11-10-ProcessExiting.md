@@ -1,6 +1,6 @@
 ---
 title: 프로세스 종료 위장 (ProcessExiting)
-categories: [HackTool Analysis Report]
+categories: [Analysis Report]
 tags: [Windows Kernel]
 ---
 
