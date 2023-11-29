@@ -183,7 +183,7 @@ ffff8a09`97a57158  00000000`00000000
 ```
 
 ## Windbg Script
-덤프 분석 시 활용할 수 있는 스크립트를 개발하였습니다. PID를 전달하면 PspCidTable을 참조하여 프로세스 오브젝트를 반환합니다. 해당 코드는 [GitHub](https://github.com/cshelldll/Windbg-Scripts/blob/main/LookupPspCidTable)에도 업르드되어 있습니다.
+덤프 분석 시 활용할 수 있는 스크립트를 개발하였습니다. PID를 전달하면 PspCidTable을 참조하여 프로세스 오브젝트를 반환합니다. 해당 코드는 [GitHub](https://github.com/cshelldll/Windbg-Scripts/blob/main/LookupPspCidTable)에도 업로드되어 있습니다.
 ```
 $$ nt!ExpLookupHandleTableEntry - Windbg 스크립트 내부 구현
 $$ 작성 버전 : Windows 10 Kernel Version 19041 MP (8 procs) Free x64 
