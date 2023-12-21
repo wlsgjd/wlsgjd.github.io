@@ -4,6 +4,8 @@ categories: [Analysis Report]
 tags: [Windows Kernel]
 ---
 
+작성 중 입니다... (임시 저장)
+
 ## STATUS_UNSUCCESSFUL (0xC0000001)
 OpenProcess를 호출하면 0xC0000001를 반환하며 실패하는 해킹툴이 발견되었습니다. 
 
