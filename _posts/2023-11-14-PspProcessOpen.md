@@ -1047,7 +1047,7 @@ static NTSTATUS MyPspProcessOpen(OB_OPEN_REASON OpenReason, BYTE AccessMode, PEP
 	return hook_table->old_OpenProcedure(OpenReason, AccessMode, Process, Object, GrantedAccess, HandleCount);
 };
 ```
-그러나 직접 빌드하여 바이너리를 확인해보면 다음과 같이 정적 포인터를 최초 1번이 아닌, 참조 될 때마다(해당 코드에서는 총 2번 실행) 참조합니다. 이 경우, 시그니처 메모리 패치가 최초 1회만 진행되어 실행 시 bsod가 발생합니다.
+그러나 빌드하여 바이너리를 확인 시, 코드 최적화에 의해 다음과 같이 정적 포인터를 최초 1번이 아닌, 참조 될 때마다(해당 코드에서는 총 2번 실행) 참조하는 것을 확인할 수 있습니다. 이 경우, 시그니처가 전부 패치되지 않아 BSOD가 발생합니다.
 ![](/assets/posts/2023-11-14-PspProcessOpen/11.png)
 
 그리하여 다음과 같이 내부에서 this_ptr을 참조하도록 코드를 구성하여 최초 1회만 정적 포인터를 참조하고, 내부 지역 변수(r11)를 통해 추가로 참조되도록 설계하였습니다. 
