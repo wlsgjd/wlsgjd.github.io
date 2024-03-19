@@ -1025,8 +1025,8 @@ ffff9d01`69ff0f90  fffff804`8d141930 <Unloaded_HookProcessOpen.sys>+0x1930
 프로젝트 설정 후, Re-Build 하게 되면 다음과 같이 포인터 함수가 의도한대로 호출됩니다.
 ![](/assets/posts/2023-11-14-PspProcessOpen/4.png)
 
-### Function Pointer (THIS_PTR)
-아래에 코드는 봤을 때 아무런 문제가 없습니다. 
+### THIS_PTR
+아래에 코드는 눈으로 봤을 때 아무런 문제가 없습니다. 하나의 지역 변수에 정적 메모리 주소를 한번 참조하고, 이를 통해 동작하는 그런 코드입니다.
 ```cpp
 static NTSTATUS MyPspProcessOpen(OB_OPEN_REASON OpenReason, BYTE AccessMode, PEPROCESS Process, PVOID Object, ACCESS_MASK GrantedAccess, ULONG HandleCount)
 {
@@ -1047,3 +1047,8 @@ static NTSTATUS MyPspProcessOpen(OB_OPEN_REASON OpenReason, BYTE AccessMode, PEP
 	return hook_table->old_OpenProcedure(OpenReason, AccessMode, Process, Object, GrantedAccess, HandleCount);
 };
 ```
+그러나 직접 빌드하여 바이너리를 확인해보면 다음과 같이 정적 포인터를 최초 1번이 아닌, 참조 될 때마다(해당 코드에서는 총 2번 실행) 참조합니다. 이 경우, 시그니처 메모리 패치가 최초 1회만 진행되어 실행 시 bsod가 발생합니다.
+![](/assets/posts/2023-11-14-PspProcessOpen/11.png)
+
+그리하여 다음과 같이 내부에서 this_ptr을 참조하도록 코드를 구성하여 최초 1회만 정적 포인터를 참조하고, 내부 지역 변수(r11)를 통해 추가로 참조되도록 설계하였습니다. 
+![](/assets/posts/2023-11-14-PspProcessOpen/12.png)
