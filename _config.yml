@@ -16,7 +16,7 @@ timezone:
 
 title: cshelldll # the main title
 
-tagline: Anti-Cheat Blog. # it will display as the sub-title
+tagline: Anti-Cheat Reverse Engineer. # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
   cshelldll

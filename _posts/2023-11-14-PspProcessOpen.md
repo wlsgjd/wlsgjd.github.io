@@ -19,12 +19,227 @@ OpenProcess를 호출하면 0xC0000001를 반환하며 실패하는 해킹툴이
 ntkrnlmp 내에 존재하는 OpenProcess와 관련된 반환 부분을 전부 확인하였지만 조작으로 의심되는 부분이 확인되지 않았습니다.
 ![](/assets/posts/2023-11-14-PspProcessOpen/6.png)
 
-## Kernel Memory Dump
-
 ## Kernel Debugging
+덤프만으로는 변조된 위치를 찾기 어렵기 때문에, 가상 환경에서 커널 디버깅을 통해 분석을 진행하였습니다. 다음과 같이 보호가 걸린 프로세스를 대상으로 OpenProcess를 시도하고 동적 분석을 진행합니다.
+```
+#include <Windows.h>
+#include <stdio.h>
+
+int main()
+{
+    MessageBoxA(0, "Wait", "debug", 0);
+
+    // dwm.exe
+    HANDLE dwm = 0;
+    do
+    {
+        dwm = OpenProcess(PROCESS_ALL_ACCESS, false, 9360);
+
+        printf("handle : %08X\n", dwm);
+    } while (!dwm);
+
+    system("pause");
+}
+```
+
+분석은 Windbg Preview를 통해 진행하였으며, 커널 디버그 모드에서는 다음과 같이 대상 프로세스를 찾고 bp를 설정합니다.
+```
+2: kd> !process 0 0 test.exe
+PROCESS ffffce05ef58a080
+    SessionId: 1  Cid: 2aa8    Peb: abecbd3000  ParentCid: 1578
+    DirBase: 12809a000  ObjectTable: ffffe086d45b5b40  HandleCount: 138.
+    Image: test.exe
+
+2: kd> .process /i /r /p ffffce05ef58a080
+You need to continue execution (press 'g' <enter>) for the context
+to be switched. When the debugger breaks in again, you will be in
+the new process context.
+2: kd> g
+Break instruction exception - code 80000003 (first chance)
+nt!DbgBreakPointWithStatus:
+fffff805`25407150 cc              int     3
+14: kd> .reload /user
+Loading User Symbols
+...............................
+
+14: kd> u test!main
+test!main [C:\Users\JH\Downloads\ConsoleApplication5\ConsoleApplication5.cpp @ 5]:
+00007ff6`fd631070 4883ec28        sub     rsp,28h
+00007ff6`fd631074 4533c9          xor     r9d,r9d
+00007ff6`fd631077 4c8d0522e40100  lea     r8,[test!`string' (00007ff6`fd64f4a0)]
+00007ff6`fd63107e 488d1523e40100  lea     rdx,[test!`string' (00007ff6`fd64f4a8)]
+00007ff6`fd631085 33c9            xor     ecx,ecx
+00007ff6`fd631087 ff15f3610100    call    qword ptr [test!_imp_MessageBoxA (00007ff6`fd647280)]
+00007ff6`fd63108d 33d2            xor     edx,edx
+00007ff6`fd63108f 41b890240000    mov     r8d,2490h
+00007ff6`fd631095 b9ffff1f00      mov     ecx,1FFFFFh
+00007ff6`fd63109a ff15605f0100    call    qword ptr [test!_imp_OpenProcess (00007ff6`fd647000)]
+00007ff6`fd6310a0 488bd0          mov     rdx,rax
+
+0: kd> bp /p @$proc 00007ff6`fd63109a
+```
+
+이후에 메세지 박스를 확인하여 OpenProcess가 실행되면 중단점이 실행됩니다.
+![](/assets/posts/2023-11-14-PspProcessOpen/9.png)
+
+동적 디버깅을 통해 함수 내부로 진입해 다음과 같은 코드 위치에서 0xC0000001가 반환되는 것을 확인하였습니다.
+```
+14: kd> u rip-5
+nt!ObpIncrementHandleCountEx+0x343:
+fffff805`2564be23 e828c0dbff      call    nt!guard_dispatch_icall (fffff805`25407e50)
+fffff805`2564be28 8be8            mov     ebp,eax
+fffff805`2564be2a 4584ed          test    r13b,r13b
+fffff805`2564be2d 0f8515010000    jne     nt!ObpIncrementHandleCountEx+0x468 (fffff805`2564bf48)
+fffff805`2564be33 65488b042588010000 mov   rax,qword ptr gs:[188h]
+fffff805`2564be3c 66ff88e4010000  dec     word ptr [rax+1E4h]
+fffff805`2564be43 33d2            xor     edx,edx
+fffff805`2564be45 498bce          mov     rcx,r14
+
+14: kd> r
+rax=00000000c0000001 rbx=ffffce05e64b0400 rcx=0000000000000001
+rdx=0000000000000001 rsi=0000000000000001 rdi=ffffce05eb26f050
+rip=fffff8052564be28 rsp=fffff40851bff160 rbp=ffffce05ec1bd080
+ r8=ffffce05ec1bd080  r9=ffffce05eb26f080 r10=0000000000002a68
+r11=ffffce05e5f030b0 r12=0000000000000001 r13=0000000000000000
+r14=ffffce05eb26f060 r15=0000000000000000
+iopl=0         nv up ei pl zr na po nc
+cs=0010  ss=0018  ds=002b  es=002b  fs=0053  gs=002b             efl=00040246
+nt!ObpIncrementHandleCountEx+0x348:
+fffff805`2564be28 8be8            mov     ebp,eax
+```
+
+해당 위치를 다시 확인해보면 다음과 같이 심볼 정보가 존재하지 않은 특정 함수로 진입합니다. 함수 내부에서는 0xC0000001를 반환하고 있으며, 해킹툴에 의하여 호출되는 함수로 추측할 수 있습니다.
+```
+ffffce05`e5f19000 49bbb030f0e505ceffff mov     r11, 0FFFFCE05E5F030B0h
+ffffce05`e5f1900a 4d3bc1               cmp     r8, r9
+ffffce05`e5f1900d 741a                 je      FFFFCE05E5F19029
+ffffce05`e5f1900f 85c9                 test    ecx, ecx
+ffffce05`e5f19011 7416                 je      FFFFCE05E5F19029
+ffffce05`e5f19013 498b03               mov     rax, qword ptr [r11]
+ffffce05`e5f19016 4c8b5008             mov     r10, qword ptr [rax+8]
+ffffce05`e5f1901a 4d399140040000       cmp     qword ptr [r9+440h], r10
+ffffce05`e5f19021 7506                 jne     FFFFCE05E5F19029
+ffffce05`e5f19023 b8010000c0           mov     eax, 0C0000001h
+ffffce05`e5f19028 c3                   ret     
+```
+
+해당 함수의 호출 스택은 다음과 같습니다.
+
+| Ring | Call Stacks                    |
+|:-:|-----------------------------------|
+| 0 | 0xffffce05e5f19000                |
+| 0 | nt!ObpIncrementHandleCountEx      |
+| 0 | nt!ObpCreateHandle                |
+| 0 | nt!ObOpenObjectByPointer          |
+| 0 | nt!PsOpenProcess                  |
+| 0 | nt!NtOpenProcess                  |
+| 0 | nt!KiSystemServiceCopyEnd         |
+| 3 | ntdll!NtOpenProcess               |
+| 3 | KERNELBASE!OpenProcess            |
+| 3 | test!main                         |
+
+ObpIncrementHandleCountEx에서는 다음과 같이 함수 포인터를 구해오며 _guard_dispatch_icall를 통해 rax에 존재하는 해킹툴 함수를 호출합니다.
+```
+fffff805`2564bdfa 8b4c245c           mov     ecx, dword ptr [rsp+5Ch]
+fffff805`2564bdfe 4c8bc5             mov     r8, rbp
+*fffff805`2564be01 488b4378           mov     rax, qword ptr [rbx+78h]
+fffff805`2564be05 4c8b4c2470         mov     r9, qword ptr [rsp+70h]
+fffff805`2564be0a 0fb6942420010000   movzx   edx, byte ptr [rsp+120h]
+fffff805`2564be12 894c2428           mov     dword ptr [rsp+28h], ecx
+fffff805`2564be16 488b4c2468         mov     rcx, qword ptr [rsp+68h]
+fffff805`2564be1b 48894c2420         mov     qword ptr [rsp+20h], rcx
+fffff805`2564be20 418bcc             mov     ecx, r12d
+fffff805`2564be23 e828c0dbff         call    ntkrnlmp!_guard_dispatch_icall (fffff80525407e50)
+```
+
+참조되는 함수 포인터의 메모리를 확인해보면 다음과 같습니다. PspProcessClose, PspProcessDelete 함수와 함께 해킹툴 코드가 위치하고 있으며, 이를 통해 특정 함수 테이블이 후킹되었음을 추측할 수 있습니다.
+```
+4: kd> dqs rbx+78
+ffffce05`e64b0478  ffffce05`e5f19000
+ffffce05`e64b0480  fffff805`256fb510 nt!PspProcessClose
+ffffce05`e64b0488  fffff805`255f4c50 nt!PspProcessDelete
+```
+
+후킹된 함수는 nt!PspProcessOpen이며, 해킹툴이 적용되지 않은 클린 환경에서 동일한 테스트를 통해 확인하였습니다.
+![](/assets/posts/2023-11-14-PspProcessOpen/10.png)
+
+## Kernel Memory Dump
+디버깅을 통해 확인된 정보를 실제 해킹툴이 적용된 덤프 파일에서 다시 확인해봤습니다. 후킹된 nt!PspProcessOpen 함수는 PsProcessType를 통해 다음과 같이 확인할 수 있습니다.
+```
+3: kd> dqs PsProcessType
+fffff800`6dafc410  ffff8488`aa562b00
+
+3: kd> dt_object_type ffff8488`aa562b00
+ntdll!_OBJECT_TYPE
+   +0x000 TypeList         : _LIST_ENTRY [ 0xffff8488`aa562b00 - 0xffff8488`aa562b00 ]
+   +0x010 Name             : _UNICODE_STRING "Process"
+   +0x020 DefaultObject    : (null) 
+   +0x028 Index            : 0x7 ''
+   +0x02c TotalNumberOfObjects : 0xa1
+   +0x030 TotalNumberOfHandles : 0x524
+   +0x034 HighWaterNumberOfObjects : 0xa4
+   +0x038 HighWaterNumberOfHandles : 0x548
+   +0x040 TypeInfo         : _OBJECT_TYPE_INITIALIZER
+   +0x0b8 TypeLock         : _EX_PUSH_LOCK
+   +0x0c0 Key              : 0x636f7250
+   +0x0c8 CallbackList     : _LIST_ENTRY [ 0xffff9606`6a412b00 - 0xffff9606`6a429780 ]
+
+3: kd> dt_OBJECT_TYPE_INITIALIZER ffff8488`aa562b00+40
+ntdll!_OBJECT_TYPE_INITIALIZER
+   +0x000 Length           : 0x78
+   +0x002 ObjectTypeFlags  : 0xca
+   +0x002 CaseInsensitive  : 0y0
+   +0x002 UnnamedObjectsOnly : 0y1
+   +0x002 UseDefaultObject : 0y0
+   +0x002 SecurityRequired : 0y1
+   +0x002 MaintainHandleCount : 0y0
+   +0x002 MaintainTypeList : 0y0
+   +0x002 SupportsObjectCallbacks : 0y1
+   +0x002 CacheAligned     : 0y1
+   +0x003 UseExtendedParameters : 0y0
+   +0x003 Reserved         : 0y0000000 (0)
+   +0x004 ObjectTypeCode   : 0x20
+   +0x008 InvalidAttributes : 0xb0
+   +0x00c GenericMapping   : _GENERIC_MAPPING
+   +0x01c ValidAccessMask  : 0x1fffff
+   +0x020 RetainAccess     : 0x101000
+   +0x024 PoolType         : 200 ( NonPagedPoolNx )
+   +0x028 DefaultPagedPoolCharge : 0x1000
+   +0x02c DefaultNonPagedPoolCharge : 0xa98
+   +0x030 DumpProcedure    : (null) 
+   +0x038 OpenProcedure    : 0xffff8488`aa5624e0     long  +ffff8488aa5624e0
+   +0x040 CloseProcedure   : 0xfffff800`6d46e6e0     void  nt!PspProcessClose+0
+   +0x048 DeleteProcedure  : 0xfffff800`6d4039e0     void  nt!PspProcessDelete+0
+   +0x050 ParseProcedure   : (null) 
+   +0x050 ParseProcedureEx : (null) 
+   +0x058 SecurityProcedure : 0xfffff800`6d4d8eb0     long  nt!SeDefaultObjectMethod+0
+   +0x060 QueryNameProcedure : (null) 
+   +0x068 OkayToCloseProcedure : (null) 
+   +0x070 WaitObjectFlagMask : 0
+   +0x074 WaitObjectFlagOffset : 0
+   +0x076 WaitObjectPointerOffset : 0
+```
+
+이전에 확인된 내용과 동일하게 OpenProcedure(PspProcessOpen) 함수가 함수 테이블을 통해 후킹되어 있습니다.
+```
+3: kd> dt_OBJECT_TYPE_INITIALIZER ffff8488`aa562b00+40
+ntdll!_OBJECT_TYPE_INITIALIZER
+   +0x038 OpenProcedure    : 0xffff8488`aa5624e0     long  +ffff8488aa5624e0
+   +0x040 CloseProcedure   : 0xfffff800`6d46e6e0     void  nt!PspProcessClose+0
+   +0x048 DeleteProcedure  : 0xfffff800`6d4039e0     void  nt!PspProcessDelete+0
+```
+
+해킹툴이 적용되지 않은 정상 환경에서는 다음과 같이 OpenProcess가 nt!PspProcessOpen을 나타냅니다.
+```
+3: kd> dt_OBJECT_TYPE_INITIALIZER ffff8488`aa562b00+40
+ntdll!_OBJECT_TYPE_INITIALIZER
+   +0x038 OpenProcedure    : 0xfffff800`6d3fd930     long  nt!PspProcessOpen+0
+   +0x040 CloseProcedure   : 0xfffff800`6d46e6e0     void  nt!PspProcessClose+0
+   +0x048 DeleteProcedure  : 0xfffff800`6d4039e0     void  nt!PspProcessDelete+0
+```
 
 ## Hookcode
-해킹툴에서 사용하는 후킹 코드는 다음과 같으며 다양한 기능을 수행하고 있습니다.
+해킹툴에서 사용하는 후킹 코드는 다음과 같으며 다양한 기능을 수행하고 있습니다. 간략하게 핵심적인 부분만 분석 진행하였습니다.
 ```
 3: kd> $$>< C:\git\Windbg Scripts\CheckOpenProcedure
 hooked openprocedure.
@@ -474,7 +689,7 @@ switch ((_DWORD)io_buffer)
 }
 ```
 ### SubProcess
-특정 프로세스를 서브 프로세스로 전환합니다. 전환되면 보호 대상 목록에 추가되며, 통신에
+특정 프로세스를 서브 프로세스로 전환합니다. 전환되면 보호 대상 목록에 추가되며, PEB 영역을 통해 커널 영역과 통신합니다.
 ```cpp
     // 서브 프로세스 지정
     PPEB peb = hookTable->ntCall.fpPsGetProcessPeb(process);
@@ -502,7 +717,7 @@ switch ((_DWORD)io_buffer)
 ```
 
 ### OpenProcedure
-PspProcessOpen을 후킹하여 실행되는 코드입니다. 다른 프로세스에서 보호 프로세스에 접근하면 STATUS_UNSUCCESSFUL을 반환하고, 아닌 경우에 원본 함수를 호출합니다.
+PspProcessOpen을 후킹하여 실행되는 코드입니다. 다른 프로세스에서 보호 프로세스에 접근하면 STATUS_UNSUCCESSFUL을 반환하고, 아닌 경우에 원본 함수를 호출합니다. 해킹툴 프로세스를 OpenProcess 시도했을 때 실패한 이유입니다.
 ```cpp
 NTSTATUS PspProcessOpen_Hook(OB_OPEN_REASON OpenReason, BYTE AccessMode, PEPROCESS process, PVOID Object, ACCESS_MASK* GrantedAccess, ULONG HandleCount)
 {
@@ -541,7 +756,159 @@ NTSTATUS PspProcessOpen_Hook(OB_OPEN_REASON OpenReason, BYTE AccessMode, PEPROCE
 }
 ```
 
-## CFG (Control Flow Guard)
+## Windbg Script
+덤프 분석 시 활용할 수 있는 스크립트를 개발하였습니다. Export 변수인 PsProcessType를 참조하여 OpenProcedure(PspProcessOpen)이 후킹되어있는지 검사합니다. 해당 코드는 [GitHub](https://github.com/cshelldll/Windbg-Scripts/blob/main/CheckOpenProcedure)에도 업로드되어 있습니다.
+```
+$$ OpenProcedure 후킹 체크
+$$ 작성 버전 : Windows 10 Kernel Version 19041 MP (4 procs) Free x64 
+$$ 사용 방법 : CheckOpenProcedure
+$$ 작성일 : 2022-03-16
+$$ 작성자 : cshelldll
+
+r $t0 = poi(nt!PsProcessType)
+
+$$ object_type->TypeInfo->OpenProcedure
+r $t1 = poi(@$t0 + 0x78)
+
+.if (@$t1 != nt!PspProcessOpen)
+{
+	.printf "hooked openprocedure.\n"
+    dqs (@$t0 + 0x78) L? 3
+	.printf "\n"
+	u @$t1
+}
+.else
+{
+	.printf "clean openprocedure.\n"
+}
+```
+사용 방법은 다음과 같습니다. 후킹된 경우에는 변조된 위치와 호출되는 함수 코드를 출력합니다.
+```
+5: kd> $$>< C:\git\Windbg Scripts\CheckOpenProcedure
+hooked openprocedure.
+ffffd808`35165b48  fffff803`4f9e3f68
+ffffd808`35165b50  fffff803`324c4e00 nt!PspProcessClose
+ffffd808`35165b58  fffff803`3245f840 nt!PspProcessDelete
+
+fffff803`4f9e3f68 e9e1001500      jmp     fffff803`4fb3404e
+fffff803`4f9e3f6d cc              int     3
+fffff803`4f9e3f6e cc              int     3
+fffff803`4f9e3f6f cc              int     3
+fffff803`4f9e3f70 cc              int     3
+fffff803`4f9e3f71 cc              int     3
+fffff803`4f9e3f72 cc              int     3
+fffff803`4f9e3f73 cc              int     3
+```
+후킹되지 않은 경우엔 다음과 같이 클린 메세지를 출력합니다.
+```
+2: kd> $$>< C:\git\Windbg Scripts\CheckOpenProcedure
+clean openprocedure.
+```
+
+## POC Code
+분석한 내용을 바탕으로 해킹툴과 동일하게 동작하는 코드를 개발하였습니다. 전체 소스코드는 [GitHub](https://github.com/cshelldll/MyPOC/tree/main/HookProcessOpen)에 업로드 하였습니다.
+
+후킹 코드는 드라이버가 언로드 되어도 동작해야 하기 때문에 다음과 같이 NonPagedPool 영역에 복사하였습니다.
+```cpp
+OB_OPEN_METHOD fpMyPspProcessOpen = ExAllocatePool(NonPagedPool, HOOK_FUNC_SIZE);
+RtlCopyMemory(fpMyPspProcessOpen, MyPspProcessOpen, HOOK_FUNC_SIZE);
+```
+또한, 원본 함수 및 보호 대상을 포함하고 있는 데이터 테이블을 NonPagedPool 영역에 생성하였습니다. 해당 메모리 구조는 해킹툴과 동일하게 제작하였습니다.
+```cpp
+typedef struct _MY_HOOK_TABLE MY_HOOK_TABLE, * PMY_HOOK_TABLE;
+typedef struct _MY_HOOK_TABLE
+{
+	MY_HOOK_TABLE*	this_ptr;
+	HANDLE			dwm_pid;
+	OB_OPEN_METHOD	old_OpenProcedure;
+} MY_HOOK_TABLE, * PMY_HOOK_TABLE;
+```
+```cpp
+PMY_HOOK_TABLE hook_table = ExAllocatePool(NonPagedPool, sizeof(MY_HOOK_TABLE));
+hook_table->this_ptr = hook_table;
+hook_table->old_OpenProcedure = processType->TypeInfo.OpenProcedure;
+hook_table->dwm_pid = GetProcessId(eprocess);
+```
+
+그리고, 시그니처 형태의 정적 주소를 NonPagedPool 영역에 할당한 메모리 주소로 교체합니다. 이렇게 되면 드라이버가 언로드 되어도 새로 할당된 NonPagedPool 메모리 영역을 참조하여 실행하게 됩니다.
+```cpp
+#define HOOK_TABLE_SIG		(ULONG64)0x123456789
+#define THIS_PTR(p)			p->this_ptr
+
+#define GET_PROCESS_ID(p)	(*(ULONG64*)((BYTE*)p + 0x440))				// EPROCESS->UniqueProcessId
+
+static NTSTATUS MyPspProcessOpen(OB_OPEN_REASON OpenReason, BYTE AccessMode, PEPROCESS Process, PVOID Object, ACCESS_MASK GrantedAccess, ULONG HandleCount)
+{
+	PMY_HOOK_TABLE hook_table = HOOK_TABLE_SIG;
+
+	if (Process != Object)
+	{
+		if (OpenReason != ObCreateHandle)
+		{
+			if (GET_PROCESS_ID(Object) == THIS_PTR(hook_table)->dwm_pid)
+			{
+				return STATUS_UNSUCCESSFUL;
+			}
+		}
+	}
+
+	// Disabled cfg(Control Flow Guard)
+	return THIS_PTR(hook_table)->old_OpenProcedure(OpenReason, AccessMode, Process, Object, GrantedAccess, HandleCount);
+};
+```
+```cpp
+PVOID SearchHookSignature64(PVOID addr, ULONG64 sig, SIZE_T size)
+{
+	SIZE_T max_size = size - sizeof(ULONG64);
+
+	for (int i = 0; i <= max_size; ++i)
+	{
+		ULONG64* addr64 = (BYTE*)addr + i;
+		if (*addr64 == sig)
+			return addr64;
+	}
+
+	return 0;
+};
+
+int PatchHookTableAddress64(PVOID HookFunc, ULONG64 sig, PMY_HOOK_TABLE HookTable, SIZE_T Size)
+{
+	int result = 0;
+
+	while (1)
+	{
+		PULONG64 my_sig = SearchHookSignature64(HookFunc, HOOK_TABLE_SIG, Size);
+
+		if (my_sig)
+		{
+			*my_sig = HookTable;
+			result++;
+		}
+		else
+		{
+			break;
+		}
+
+	}
+	return result;
+};
+```
+```cpp
+OB_OPEN_METHOD fpMyPspProcessOpen = ExAllocatePool(NonPagedPool, HOOK_FUNC_SIZE);
+RtlCopyMemory(fpMyPspProcessOpen, MyPspProcessOpen, HOOK_FUNC_SIZE);
+if (PatchHookTableAddress64(fpMyPspProcessOpen, HOOK_TABLE_SIG, hook_table, HOOK_FUNC_SIZE) > 0)
+{
+	processType->TypeInfo.OpenProcedure = fpMyPspProcessOpen;
+
+	DbgPrint("ProcessOpenProcedure : 0x%p => 0x%p\n",
+		hook_table->old_OpenProcedure,
+		processType->TypeInfo.OpenProcedure);
+}
+```
+실행 시 다음과 같이 프로세스가 보호되어 OpenProcess가 실패합니다.
+![](/assets/posts/2023-11-14-PspProcessOpen/1.png)
+
+### CFG (Control Flow Guard)
 버퍼 오버플로우와 같은 메모리 취약점을 방지하기 위해 만들어진 보안 기능이며 빌드 옵션 중 하나입니다.
 ```
 What is Control Flow Guard?
@@ -658,7 +1025,7 @@ ffff9d01`69ff0f90  fffff804`8d141930 <Unloaded_HookProcessOpen.sys>+0x1930
 프로젝트 설정 후, Re-Build 하게 되면 다음과 같이 포인터 함수가 의도한대로 호출됩니다.
 ![](/assets/posts/2023-11-14-PspProcessOpen/4.png)
 
-## Function Pointer (THIS_PTR)
+### Function Pointer (THIS_PTR)
 아래에 코드는 봤을 때 아무런 문제가 없습니다. 
 ```cpp
 static NTSTATUS MyPspProcessOpen(OB_OPEN_REASON OpenReason, BYTE AccessMode, PEPROCESS Process, PVOID Object, ACCESS_MASK GrantedAccess, ULONG HandleCount)
@@ -680,155 +1047,3 @@ static NTSTATUS MyPspProcessOpen(OB_OPEN_REASON OpenReason, BYTE AccessMode, PEP
 	return hook_table->old_OpenProcedure(OpenReason, AccessMode, Process, Object, GrantedAccess, HandleCount);
 };
 ```
-
-## Windbg Script
-덤프 분석 시 활용할 수 있는 스크립트를 개발하였습니다. Export 변수인 PsProcessType를 참조하여 OpenProcedure(PspProcessOpen)이 후킹되어있는지 검사합니다. 해당 코드는 [GitHub](https://github.com/cshelldll/Windbg-Scripts/blob/main/CheckOpenProcedure)에도 업로드되어 있습니다.
-```
-$$ OpenProcedure 후킹 체크
-$$ 작성 버전 : Windows 10 Kernel Version 19041 MP (4 procs) Free x64 
-$$ 사용 방법 : CheckOpenProcedure
-$$ 작성일 : 2022-03-16
-$$ 작성자 : cshelldll
-
-r $t0 = poi(nt!PsProcessType)
-
-$$ object_type->TypeInfo->OpenProcedure
-r $t1 = poi(@$t0 + 0x78)
-
-.if (@$t1 != nt!PspProcessOpen)
-{
-	.printf "hooked openprocedure.\n"
-    dqs (@$t0 + 0x78) L? 3
-	.printf "\n"
-	u @$t1
-}
-.else
-{
-	.printf "clean openprocedure.\n"
-}
-```
-사용 방법은 다음과 같습니다. 후킹된 경우에는 변조된 위치와 호출되는 함수 코드를 출력합니다.
-```
-5: kd> $$>< C:\git\Windbg Scripts\CheckOpenProcedure
-hooked openprocedure.
-ffffd808`35165b48  fffff803`4f9e3f68
-ffffd808`35165b50  fffff803`324c4e00 nt!PspProcessClose
-ffffd808`35165b58  fffff803`3245f840 nt!PspProcessDelete
-
-fffff803`4f9e3f68 e9e1001500      jmp     fffff803`4fb3404e
-fffff803`4f9e3f6d cc              int     3
-fffff803`4f9e3f6e cc              int     3
-fffff803`4f9e3f6f cc              int     3
-fffff803`4f9e3f70 cc              int     3
-fffff803`4f9e3f71 cc              int     3
-fffff803`4f9e3f72 cc              int     3
-fffff803`4f9e3f73 cc              int     3
-```
-후킹되지 않은 경우엔 다음과 같이 클린 메세지를 출력합니다.
-```
-2: kd> $$>< C:\git\Windbg Scripts\CheckOpenProcedure
-clean openprocedure.
-```
-
-## POC Code
-분석한 내용을 바탕으로 해킹툴과 동일하게 동작하는 코드를 개발하였습니다. 전체 소스코드는 [GitHub](https://github.com/cshelldll/MyPOC/tree/main/HookProcessOpen)에 업로드 하였습니다.
-
-후킹 코드는 드라이버가 언로드 되어도 동작해야 하기 때문에 다음과 같이 NonPagedPool 영역에 복사하였습니다.
-```cpp
-OB_OPEN_METHOD fpMyPspProcessOpen = ExAllocatePool(NonPagedPool, HOOK_FUNC_SIZE);
-RtlCopyMemory(fpMyPspProcessOpen, MyPspProcessOpen, HOOK_FUNC_SIZE);
-```
-또한 원본 함수 및 보호 대상을 포함하고 있는 데이터 테이블을 NonPagedPool 영역에 생성하였습니다.
-```cpp
-typedef struct _MY_HOOK_TABLE MY_HOOK_TABLE, * PMY_HOOK_TABLE;
-typedef struct _MY_HOOK_TABLE
-{
-	MY_HOOK_TABLE*	this_ptr;
-	HANDLE			dwm_pid;
-	OB_OPEN_METHOD	old_OpenProcedure;
-} MY_HOOK_TABLE, * PMY_HOOK_TABLE;
-```
-```cpp
-PMY_HOOK_TABLE hook_table = ExAllocatePool(NonPagedPool, sizeof(MY_HOOK_TABLE));
-hook_table->this_ptr = hook_table;
-hook_table->old_OpenProcedure = processType->TypeInfo.OpenProcedure;
-hook_table->dwm_pid = GetProcessId(eprocess);
-```
-
-그리고, 시그니처 형태의 정적 주소를 NonPagedPool 영역에 할당한 메모리 주소로 교체합니다. 이렇게 되면 드라이버가 언로드 되어도 새로 할당된 NonPagedPool 메모리 영역을 참조하여 실행하게 됩니다.
-```cpp
-#define HOOK_TABLE_SIG		(ULONG64)0x123456789
-#define THIS_PTR(p)			p->this_ptr
-
-#define GET_PROCESS_ID(p)	(*(ULONG64*)((BYTE*)p + 0x440))				// EPROCESS->UniqueProcessId
-
-static NTSTATUS MyPspProcessOpen(OB_OPEN_REASON OpenReason, BYTE AccessMode, PEPROCESS Process, PVOID Object, ACCESS_MASK GrantedAccess, ULONG HandleCount)
-{
-	PMY_HOOK_TABLE hook_table = HOOK_TABLE_SIG;
-
-	if (Process != Object)
-	{
-		if (OpenReason != ObCreateHandle)
-		{
-			if (GET_PROCESS_ID(Object) == THIS_PTR(hook_table)->dwm_pid)
-			{
-				return STATUS_UNSUCCESSFUL;
-			}
-		}
-	}
-
-	// Disabled cfg(Control Flow Guard)
-	return THIS_PTR(hook_table)->old_OpenProcedure(OpenReason, AccessMode, Process, Object, GrantedAccess, HandleCount);
-};
-```
-```cpp
-PVOID SearchHookSignature64(PVOID addr, ULONG64 sig, SIZE_T size)
-{
-	SIZE_T max_size = size - sizeof(ULONG64);
-
-	for (int i = 0; i <= max_size; ++i)
-	{
-		ULONG64* addr64 = (BYTE*)addr + i;
-		if (*addr64 == sig)
-			return addr64;
-	}
-
-	return 0;
-};
-
-int PatchHookTableAddress64(PVOID HookFunc, ULONG64 sig, PMY_HOOK_TABLE HookTable, SIZE_T Size)
-{
-	int result = 0;
-
-	while (1)
-	{
-		PULONG64 my_sig = SearchHookSignature64(HookFunc, HOOK_TABLE_SIG, Size);
-
-		if (my_sig)
-		{
-			*my_sig = HookTable;
-			result++;
-		}
-		else
-		{
-			break;
-		}
-
-	}
-	return result;
-};
-```
-```cpp
-OB_OPEN_METHOD fpMyPspProcessOpen = ExAllocatePool(NonPagedPool, HOOK_FUNC_SIZE);
-RtlCopyMemory(fpMyPspProcessOpen, MyPspProcessOpen, HOOK_FUNC_SIZE);
-if (PatchHookTableAddress64(fpMyPspProcessOpen, HOOK_TABLE_SIG, hook_table, HOOK_FUNC_SIZE) > 0)
-{
-	processType->TypeInfo.OpenProcedure = fpMyPspProcessOpen;
-
-	DbgPrint("ProcessOpenProcedure : 0x%p => 0x%p\n",
-		hook_table->old_OpenProcedure,
-		processType->TypeInfo.OpenProcedure);
-}
-```
-실행 시 다음과 같이 프로세스가 보호되어 OpenProcess가 실패합니다.
-![](/assets/posts/2023-11-14-PspProcessOpen/1.png)
