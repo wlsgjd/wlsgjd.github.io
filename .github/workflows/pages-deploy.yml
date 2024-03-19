@@ -46,7 +46,7 @@ jobs:
           bundler-cache: true
 
       - name: Clean Cache
-        run: bundle exec jekyll clean"
+        run: bundle exec jekyll clean
 
       - name: Build site
         run: bundle exec jekyll b -d "_site${{ steps.pages.outputs.base_path }}"
