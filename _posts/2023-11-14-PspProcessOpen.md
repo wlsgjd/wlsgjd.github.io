@@ -4,8 +4,6 @@ categories: [Analysis Report]
 tags: [Windows Kernel]
 ---
 
-작성 중 입니다... (임시 저장)
-
 ## STATUS_UNSUCCESSFUL (0xC0000001)
 OpenProcess를 호출하면 0xC0000001를 반환하며 실패하는 해킹툴이 발견되었습니다. 
 
@@ -22,6 +20,8 @@ ntkrnlmp 내에 존재하는 OpenProcess와 관련된 반환 부분을 전부 �
 ![](/assets/posts/2023-11-14-PspProcessOpen/6.png)
 
 ## Kernel Memory Dump
+
+## Kernel Debugging
 
 ## Hookcode
 해킹툴에서 사용하는 후킹 코드는 다음과 같으며 다양한 기능을 수행하고 있습니다.
