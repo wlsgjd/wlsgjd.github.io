@@ -923,7 +923,6 @@ Make it harder to exploit arbitrary code through vulnerabilities such as buffer 
 해당 프로젝트를 빌드하게 되면 원본 프로시저(old_OpenProcedure) 호출 부분에서 포인터 호출이 아닌,  gaurd_dispatch_icall_fptr 형태의 함수가 호출되고 있습니다. 
 ![](/assets/posts/2023-11-14-PspProcessOpen/3.png)
 
-
 이 상태에서 코드를 실행해 보면 BSOD가 발생합니다. 해당 오류는 언로드 된 드라이버 영역을 참조했을 때 발생하는 오류입니다.
 
 자세한 내용은 [DRIVER_UNLOADED_WITHOUT_CANCELLING_PENDING_OPERATIONS](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/bug-check-0xce--driver-unloaded-without-cancelling-pending-operations) 페이지에서 확인할 수 있습니다.
