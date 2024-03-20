@@ -9,7 +9,7 @@ order: 4
 ## Profile
 - **Name**: *Jinhyeong, Choe* (1999.11.02)
 - **EMail:** cshelldll@naver.com
-- **GitHub:** https://github.com/cshelldll
+- **GitHub:** [https://github.com/cshelldll](https://github.com/cshelldll)
 
 ## Skills
 - **Reverse Enginnering**
