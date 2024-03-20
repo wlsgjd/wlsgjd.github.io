@@ -163,6 +163,11 @@ defaults:
       path: assets/js/dist
     values:
       swcache: true
+  - scope:
+      path: "" # 모든 페이지에 대해서
+    values:
+      http_headers:
+        Cache-Control: "no-cache, no-store, must-revalidate"
 
 sass:
   style: compressed
