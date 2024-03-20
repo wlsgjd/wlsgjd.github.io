@@ -20,7 +20,6 @@ order: 4
 - Windows Internals
 - VMProtect
 - Intel VT-x
-TEST
 
 ## Careers
 - **[㈜웰비아닷컴](https://www.wellbia.com/)** 게임 해킹툴 분석 (2021 ~ 2024)
