@@ -139,6 +139,7 @@ defaults:
       path: "" # An empty string here means all files in the project
       type: posts
     values:
+      expires: "0"
       layout: post
       comments: true # Enable comments in posts.
       toc: true # Display TOC column in posts.
@@ -163,11 +164,6 @@ defaults:
       path: assets/js/dist
     values:
       swcache: true
-  - scope:
-      path: "" # 모든 페이지에 대해서
-    values:
-      http_headers:
-        Cache-Control: "no-cache, no-store, must-revalidate"
 
 sass:
   style: compressed
