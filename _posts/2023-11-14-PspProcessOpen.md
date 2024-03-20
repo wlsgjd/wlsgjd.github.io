@@ -21,7 +21,7 @@ ntkrnlmp 내에 존재하는 OpenProcess와 관련된 반환 부분을 전부 �
 
 ## Kernel Debugging
 덤프만으로는 변조된 위치를 찾기 어렵기 때문에, 가상 환경에서 커널 디버깅을 통해 분석을 진행하였습니다. 다음과 같이 보호가 걸린 프로세스를 대상으로 OpenProcess를 시도하고 동적 분석을 진행합니다.
-```
+```cpp
 #include <Windows.h>
 #include <stdio.h>
 
