@@ -1,5 +1,5 @@
 ---
-title: 물리 메모리 주소 변환 (vtop, pte)
+title: 물리 메모리 주소 변환
 categories: [Windbg]
 tags: [Windbg]
 ---
