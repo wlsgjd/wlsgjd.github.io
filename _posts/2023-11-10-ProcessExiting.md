@@ -124,7 +124,7 @@ ProcessDelete, ProcessSelfDelete이 활성화되면 PspTerminateAllThreads를 �
 그렇기 때문에 당연히 종료된 프로세스에는 스레드 생성이 불가능한 것으로 보입니다.
 
 ## POC Code
-분석한 내용을 바탕으로 해킹툴과 동일하게 동작하는 코드를 개발하였습니다. 전체 소스코드는 [GitHub](https://github.com/cshelldll/MyPOC/tree/main/ProcessExiting)에 업로드 하였습니다. 
+분석한 내용을 바탕으로 해킹툴과 동일하게 동작하는 코드를 개발하였습니다. 전체 소스코드는 [GitHub](https://github.com/snowgyu/MyPOC/tree/main/ProcessExiting)에 업로드 하였습니다. 
 ```cpp
 void SetProcessExiting(PEPROCESS eprocess, BOOL bExiting, DWORD ExitStatus)
 {
@@ -253,7 +253,7 @@ ProcessBasicInformation는 문서화되지 않은 PROCESS_EXTENDED_BASIC_INFORMA
 ProcessSelfDelete, ProcessDelete에 대한 값 또한 PROCESS_EXTENDED_BASIC_INFORMATION를 통해서 확인이 가능합니다. 다음과 같이 해당 값이 활성화된 경우 0x04 값을 반환합니다.
 ![](/assets/posts/2023-11-10-ProcessExiting/7.png)
 
-이를 활용하여 flags롤 조작한 핵툴을 유저 레벨에서 탐지할 수 있습니다. 전체 소스코드는 [GitHub](https://github.com/cshelldll/MyPOC/tree/main/ExitingDetector)에 업로드하였습니다. 해당 프로그램은 x64를 기준으로 제작되었기 때문에 x86 파일에 대해서는 따로 포팅 작업이 필요합니다.
+이를 활용하여 flags롤 조작한 핵툴을 유저 레벨에서 탐지할 수 있습니다. 전체 소스코드는 [GitHub](https://github.com/snowgyu/MyPOC/tree/main/ExitingDetector)에 업로드하였습니다. 해당 프로그램은 x64를 기준으로 제작되었기 때문에 x86 파일에 대해서는 따로 포팅 작업이 필요합니다.
 ```cpp
 typedef struct _PROCESS_EXTENDED_BASIC_INFORMATION
 {

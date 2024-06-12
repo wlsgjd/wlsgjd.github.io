@@ -138,13 +138,13 @@ NTSTATUS __stdcall ObReferenceObjectByPointerWithTag(
 ## ObjectType
 오브젝트 타입 리스트는 따로 정리된게 없어보여서 직접 windbg 스크립트를 통해 추출하였습니다. 시스템 프로세스를 대상으로 오브젝트 타입을 변경하고 !object 명령을 통해 심볼명을 출력합니다.
 
-해당 스크립트 파일은 [GitHub](https://github.com/cshelldll/Windbg-Scripts/blob/main/GetObjectTypeList)에 업로드 하였습니다.
+해당 스크립트 파일은 [GitHub](https://github.com/snowgyu/Windbg-Scripts/blob/main/GetObjectTypeList)에 업로드 하였습니다.
 ```
 $$ GetObjectTypeList
 $$ 작성 버전 : Windows 10 Kernel Version 19041 MP (4 procs) Free x64 
 $$ 사용 방법 : GetObjectTypeList
 $$ 작성일 : 2023-11-14
-$$ 작성자 : cshelldll
+$$ 작성자 : snowgyu
 
 $$ ProcessEntry
 r $t0 = poi(nt!PsActiveProcessHead)-448 
@@ -426,7 +426,7 @@ nt!_OBJECT_TYPE
 
 ## POC Code
 분석한 내용을 바탕으로 해킹툴과 동일하게 동작하는 코드를 개발하였습니다.
-전체 소스코드는 [GitHub](https://github.com/cshelldll/MyPOC/tree/main/ProcessObjType)에 업로드하였습니다.
+전체 소스코드는 [GitHub](https://github.com/snowgyu/MyPOC/tree/main/ProcessObjType)에 업로드하였습니다.
 
 시스템 프로세스의 오브젝트 타입이 OBJECT_TYPE_PROCESS 고정인 것을 이용하여 역연산을 통해 ObHeaderCookie 값을 획득하고, 해당 값을 통해 대상 프로세스의 TypeIndex를 변경합니다.
 
