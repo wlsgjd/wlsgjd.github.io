@@ -8,8 +8,8 @@ order: 4
 
 ## Profile
 - **Name**: *Jinhyeong, Choe* (1999.11.02)
-- **EMail:** cshelldll@naver.com
-- **GitHub:** [https://github.com/cshelldll](https://github.com/cshelldll)
+- **EMail:** snowgyu@naver.com
+- **GitHub:** [https://github.com/snowgyu](https://github.com/snowgyu)
 
 ## Skills
 - **Reverse Engineering**

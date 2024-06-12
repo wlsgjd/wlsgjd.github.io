@@ -14,21 +14,21 @@ timezone:
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: cshelldll # the main title
+title: snowgyu # the main title
 
 tagline: Anti-Cheat Reverse Engineer. # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
-  cshelldll
+  snowgyu
 
 # Fill in the protocol & hostname for your site.
 # e.g. 'https://username.github.io', note that it does not end with a '/'.
-url: "https://cshelldll.github.io"
+url: "https://snowgyu.github.io"
 plugins:
   - jekyll-sitemap
   
 github:
-  username: cshelldll # change to your github username
+  username: snowgyu # change to your github username
 
 twitter:
   username: # change to your twitter username
@@ -36,12 +36,12 @@ twitter:
 social:
   # Change to your full name.
   # It will be displayed as the default author of the posts and the copyright owner in the Footer
-  name: cshelldll
-  email: cshelldll@naver.com # change to your email address
+  name: snowgyu
+  email: snowgyu@naver.com # change to your email address
   links:
     # The first element serves as the copyright owner's link
     # - https://twitter.com/username # change to your twitter homepage
-    - https://github.com/cshelldll # change to your github homepage
+    - https://github.com/snowgyu # change to your github homepage
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
     # - https://www.linkedin.com/in/username
@@ -84,7 +84,7 @@ comments:
   active: 'disqus' # The global switch for posts comments, e.g., 'disqus'.  Keep it empty means disable
   # The active options are as follows:
   disqus:
-    shortname: 'cshelldll' # fill with the Disqus shortname. › https://help.disqus.com/en/articles/1717111-what-s-a-shortname
+    shortname: 'snowgyu' # fill with the Disqus shortname. › https://help.disqus.com/en/articles/1717111-what-s-a-shortname
   # utterances settings › https://utteranc.es/
   utterances:
     repo: # <gh-username>/<repo>
