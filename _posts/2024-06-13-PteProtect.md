@@ -172,7 +172,7 @@ Evaluate expression:
 ![](/assets/posts/2024-06-13-PteProtect/8.png)
 
 ## Anti-Cheat Detection
-앞서 소개한 방식은 현재 대부분 안티치트에서 탐지하고 있다고 합니다.
+해당 방식은 현재 대부분 안티치트에서 탐지하고 있다고 합니다.
 
 PTE에 해당 비트(NX, User/supervisor)들이 설정되어 있는지 감지하고, try-catch 등을 통해 PAGE_EXECUTE 권한이 없는 코드를 실행했을 때 Access Violation이 발생하는지 확인한다네용.
 ```
