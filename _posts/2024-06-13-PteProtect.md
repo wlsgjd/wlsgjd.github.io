@@ -1,7 +1,7 @@
 ---
 title: PTE 조작을 통해 실행코드 숨기기
-categories: [Anti-Cheat]
-tags: [Anti-Cheat]
+categories: [Tech]
+tags: [Tech]
 ---
 
 ## pte-protect
