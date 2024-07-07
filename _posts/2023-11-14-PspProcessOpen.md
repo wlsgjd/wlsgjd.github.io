@@ -757,13 +757,13 @@ NTSTATUS PspProcessOpen_Hook(OB_OPEN_REASON OpenReason, BYTE AccessMode, PEPROCE
 ```
 
 ## Windbg Script
-덤프 분석 시 활용할 수 있는 스크립트를 개발하였습니다. Export 변수인 PsProcessType를 참조하여 OpenProcedure(PspProcessOpen)이 후킹되어있는지 검사합니다. 해당 코드는 [GitHub](https://github.com/snowgyu/Windbg-Scripts/blob/main/CheckOpenProcedure)에도 업로드되어 있습니다.
+덤프 분석 시 활용할 수 있는 스크립트를 개발하였습니다. Export 변수인 PsProcessType를 참조하여 OpenProcedure(PspProcessOpen)이 후킹되어있는지 검사합니다. 해당 코드는 [GitHub](https://github.com/wlsgjd/Windbg-Scripts/blob/main/CheckOpenProcedure)에도 업로드되어 있습니다.
 ```
 $$ OpenProcedure 후킹 체크
 $$ 작성 버전 : Windows 10 Kernel Version 19041 MP (4 procs) Free x64 
 $$ 사용 방법 : CheckOpenProcedure
 $$ 작성일 : 2022-03-16
-$$ 작성자 : snowgyu
+$$ 작성자 : wlsgjd
 
 r $t0 = poi(nt!PsProcessType)
 
@@ -806,7 +806,7 @@ clean openprocedure.
 ```
 
 ## POC Code
-분석한 내용을 바탕으로 해킹툴과 동일하게 동작하는 코드를 개발하였습니다. 전체 소스코드는 [GitHub](https://github.com/snowgyu/MyPOC/tree/main/HookProcessOpen)에 업로드 하였습니다.
+분석한 내용을 바탕으로 해킹툴과 동일하게 동작하는 코드를 개발하였습니다. 전체 소스코드는 [GitHub](https://github.com/wlsgjd/MyPOC/tree/main/HookProcessOpen)에 업로드 하였습니다.
 
 후킹 코드는 드라이버가 언로드 되어도 동작해야 하기 때문에 다음과 같이 NonPagedPool 영역에 복사하였습니다.
 ```cpp

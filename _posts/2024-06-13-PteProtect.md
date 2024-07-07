@@ -182,7 +182,7 @@ Btw, this itself is detected on most major anticheats (if not all). They can eas
 ```
 
 ## References
-- [https://snowgyu.github.io/posts/pml4](https://snowgyu.github.io/posts/pml4)
-- [https://snowgyu.github.io/posts/ConvertingAddress](https://snowgyu.github.io/posts/ConvertingAddress)
+- [https://wlsgjd.github.io/posts/pml4](https://wlsgjd.github.io/posts/pml4)
+- [https://wlsgjd.github.io/posts/ConvertingAddress](https://wlsgjd.github.io/posts/ConvertingAddress)
 - [https://www.unknowncheats.me/forum/anti-cheat-bypass/500230-pte-protect.html](https://www.unknowncheats.me/forum/anti-cheat-bypass/500230-pte-protect.html)
 - [https://github.com/Zpes/pte-protect](https://github.com/Zpes/pte-protect)

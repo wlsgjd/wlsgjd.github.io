@@ -8,8 +8,8 @@ order: 4
 
 ## Profile
 - **Name**: *Jinhyeong, Choe* (1999.11.02)
-- **EMail:** snowgyu@naver.com
-- **GitHub:** [https://github.com/snowgyu](https://github.com/snowgyu)
+- **EMail:** wlsgjd@naver.com
+- **GitHub:** [https://github.com/wlsgjd](https://github.com/wlsgjd)
 
 ## Skills
 - **Reverse Engineering**

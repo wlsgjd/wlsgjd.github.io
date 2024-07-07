@@ -183,13 +183,13 @@ ffff8a09`97a57158  00000000`00000000
 ```
 
 ## Windbg Script
-덤프 분석 시 활용할 수 있는 스크립트를 개발하였습니다. PID를 전달하면 PspCidTable을 참조하여 프로세스 오브젝트를 반환합니다. 해당 코드는 [GitHub](https://github.com/snowgyu/Windbg-Scripts/blob/main/LookupPspCidTable)에도 업로드되어 있습니다.
+덤프 분석 시 활용할 수 있는 스크립트를 개발하였습니다. PID를 전달하면 PspCidTable을 참조하여 프로세스 오브젝트를 반환합니다. 해당 코드는 [GitHub](https://github.com/wlsgjd/Windbg-Scripts/blob/main/LookupPspCidTable)에도 업로드되어 있습니다.
 ```
 $$ nt!ExpLookupHandleTableEntry - Windbg 스크립트 내부 구현
 $$ 작성 버전 : Windows 10 Kernel Version 19041 MP (8 procs) Free x64 
 $$ 사용 방법 : CheckPspCidTable [pid]
 $$ 작성일 : 2022-02-24
-$$ 작성자 : snowgyu
+$$ 작성자 : wlsgjd
 
 r $t0 = poi(nt!PspCidTable)
 r $t1 = ${$arg1} & 0xFFFFFFFFFFFFFFFC
@@ -296,7 +296,7 @@ ntdll!_EPROCESS
 ```
 
 ## POC Code
-분석된 내용을 바탕으로 PspCidTable를 조작하는 도구를 개발하였습니다. 전체 소스코드는 [GitHub](https://github.com/snowgyu/MyPOC/tree/main/PCTSample)에 업로드 하였습니다.
+분석된 내용을 바탕으로 PspCidTable를 조작하는 도구를 개발하였습니다. 전체 소스코드는 [GitHub](https://github.com/wlsgjd/MyPOC/tree/main/PCTSample)에 업로드 하였습니다.
 
 아래는 ntkrnlmp 내에서 PspCidTable을 찾는 코드입니다. Export 된 변수가 아니기 때문에 시그니처를 통해 스캔합니다.
 ```cpp

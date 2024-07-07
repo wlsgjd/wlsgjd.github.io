@@ -14,21 +14,21 @@ timezone:
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
 # ↓ --------------------------
 
-title: snowgyu # the main title
+title: wlsgjd # the main title
 
 tagline: Anti-Cheat Reverse Engineer. # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
-  snowgyu
+  wlsgjd
 
 # Fill in the protocol & hostname for your site.
 # e.g. 'https://username.github.io', note that it does not end with a '/'.
-url: "https://snowgyu.github.io"
+url: "https://wlsgjd.github.io"
 plugins:
   - jekyll-sitemap
   
 github:
-  username: snowgyu # change to your github username
+  username: wlsgjd # change to your github username
 
 twitter:
   username: # change to your twitter username
@@ -36,12 +36,12 @@ twitter:
 social:
   # Change to your full name.
   # It will be displayed as the default author of the posts and the copyright owner in the Footer
-  name: snowgyu
-  email: snowgyu@naver.com # change to your email address
+  name: wlsgjd
+  email: wlsgjd@naver.com # change to your email address
   links:
     # The first element serves as the copyright owner's link
     # - https://twitter.com/username # change to your twitter homepage
-    - https://github.com/snowgyu # change to your github homepage
+    - https://github.com/wlsgjd # change to your github homepage
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
     # - https://www.linkedin.com/in/username
@@ -84,14 +84,14 @@ comments:
   active: 'giscus' # The global switch for posts comments, e.g., 'disqus'.  Keep it empty means disable
   # The active options are as follows:
   disqus:
-    shortname: 'snowgyu' # fill with the Disqus shortname. › https://help.disqus.com/en/articles/1717111-what-s-a-shortname
+    shortname: 'wlsgjd' # fill with the Disqus shortname. › https://help.disqus.com/en/articles/1717111-what-s-a-shortname
   # utterances settings › https://utteranc.es/
   utterances:
     repo: # <gh-username>/<repo>
     issue_term: # < url | pathname | title | ...>
   # Giscus options › https://giscus.app
   giscus:
-    repo: "snowgyu/snowgyu.github.io" # <gh-username>/<repo>
+    repo: "wlsgjd/wlsgjd.github.io" # <gh-username>/<repo>
     repo_id: "R_kgDOKnW2Lw"
     category: "General"
     category_id: "DIC_kwDOKnW2L84CgCfZ"

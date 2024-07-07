@@ -79,7 +79,7 @@ nt!_EPROCESS
 
 
 ## POC Code
-분석된 내용을 바탕으로 프로세스 보호 도구를 개발하였습니다. 시스템 프로세스와 동일하게 Protection 필드를 0x61으로 변경하며, 전체 소스코드는 [GitHub](https://github.com/snowgyu/MyPOC/tree/main/EProtection)에 업로드 하였습니다.
+분석된 내용을 바탕으로 프로세스 보호 도구를 개발하였습니다. 시스템 프로세스와 동일하게 Protection 필드를 0x61으로 변경하며, 전체 소스코드는 [GitHub](https://github.com/wlsgjd/MyPOC/tree/main/EProtection)에 업로드 하였습니다.
 ```cpp
 void Protect(PEPROCESS eprocess, BOOL bActive)
 {
