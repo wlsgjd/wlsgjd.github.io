@@ -8,15 +8,15 @@ order: 4
 
 ## Profile
 - **Name**: *Jinhyeong, Choe* (1999.11.02)
-- **EMail:** wlsgjd@naver.com
-- **GitHub:** [https://github.com/wlsgjd](https://github.com/wlsgjd)
+- **E-Mail:** wlsgjd@naver.com
+- **GitHub:** [wlsgjd](https://github.com/wlsgjd)
 
 ## Skills
 - **Reverse Engineering**
 - C/C++ Programming
 
 ## Interests
-- Game Hacking & Anti-Cheat
+- Anti-Cheat
 - Windows Internals
 
 ## Careers
