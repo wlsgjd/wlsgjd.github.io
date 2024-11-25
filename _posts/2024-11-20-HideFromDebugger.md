@@ -160,7 +160,7 @@ EThread 에서는 HideFromDebugger라는 디버깅과 관련된 것으로 보이
 ![](/assets/posts/2024-11-20-HideFromDebugger/4.png)
 
 ## NtSetInformationThread
-해당 기능에 대하여 조사해보니, HideFromDebugger는 NtSetInformationThread를 통해 호출가능한 안티디버깅 기능입니다.
+해당 기능에 대하여 조사해보니, HideFromDebugger는 NtSetInformationThread를 통해 호출가능한 안티디버깅 기능으로 확인되었습니다.
 <br>문서화되지 않은 값, ThreadHideFromDebugger(0x11)를 전달하여 실행합니다.
 
 다음과 같이 실행하면 현재 스레드가 보호됩니다.
@@ -187,18 +187,21 @@ void main() {
 }
 ```
 
-해당 함수는 단방향성으로 동작하기 때문에, 반대로 비활성화하는 것은 불가능합니다.
+해당 함수는 단방향성으로 동작하기 때문에 반대로 비활성화하는 것은 불가능합니다.
 <br>따라서, 해당 안티디버깅을 우회하려면 NtSetInformationThread가 호출되기 전에 가로채거나, 커널 레벨에서 HideFromDebugger 값을 직접 조작해야합니다.
 ![](/assets/posts/2024-11-20-HideFromDebugger/5.png)
 
 ## DbgkForwardException
-HideFromDebugger 안티디버깅 기능은 DbgkForwardException 내에서 분기문을 통해 실행됩니다.
-<br>해당 값이 활성화되어 있는 경우, 프로세스가 종료됩니다.
+Debug Register가 활성화되면 커널 내부에서는 IDT를 통해 0x01번에 해당하는 KiDebugTrapOrFault가 호출됩니다.
+![](/assets/posts/2024-11-20-HideFromDebugger/7.png)
+
+이후에 KiDispatchException, DbgkForwardException가 순서대로 호출되며, HideFromDebugger 안티디버깅 기능은 DbgkForwardException 내에 분기문을 통해 실행됩니다.
+<br>해당 값이 활성화되어 있는 경우, 프로세스가 즉시 종료됩니다.
 ![](/assets/posts/2024-11-20-HideFromDebugger/6.png)
 
 ## Proof of Concept
 HideFromDebugger를 비활성화 하는 도구를 개발하였습니다. 실행 중인 모든 스레드의 HideFromDebugger 값을 0으로 변경합니다.
-<br>전체 소스코드는 [GitHub](https://github.com/wlsgjd/MyPOC/tree/main/UnhideDebugger)에 업로드하였습니다.
+<br>해당 기능을 비활성화 시 디버깅이 정상적으로 동작하였으며, 전체 소스코드는 [GitHub](https://github.com/wlsgjd/MyPOC/tree/main/UnhideDebugger)에 업로드하였습니다.
 ```c
 BOOL UnhideFromDebugger(PEPROCESS eprocess)
 {
@@ -232,3 +235,4 @@ BOOL UnhideFromDebugger(PEPROCESS eprocess)
 ## References
 - [NtSetInformationThread를 이용한 Anti-Debugging](https://ezbeat.tistory.com/371)
 - [Hidding Threads From Debuggers](https://waleedassar.blogspot.com/2012/11/hidding-threads-from-debuggers.html)
+- [Hardware breakpoints and exceptions on Windows](https://ling.re/hardware-breakpoints/)
