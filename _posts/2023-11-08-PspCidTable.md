@@ -1,5 +1,6 @@
 ---
 title: 오브젝트 테이블 변조 (PspCidTable)
+date: 2023-11-08 00:00:00 +/-TTTT
 categories: [Analysis Report]
 tags: [Windows Kernel]
 ---

@@ -1,5 +1,6 @@
 ---
 title: 프로세스 종료 위장 (ProcessExiting)
+date: 2023-11-10 00:00:00 +/-TTTT
 categories: [Analysis Report]
 tags: [Windows Kernel]
 ---

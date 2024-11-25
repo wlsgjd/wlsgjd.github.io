@@ -1,5 +1,6 @@
 ---
 title: 프로세스 보호 (Protection)
+date: 2023-11-06 00:00:00 +/-TTTT
 categories: [Analysis Report]
 tags: [Windows Kernel]
 ---

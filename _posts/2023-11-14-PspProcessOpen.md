@@ -1,5 +1,6 @@
 ---
 title: 프로세스 보호 (PspProcessOpen)
+date: 2023-11-14 00:00:00 +/-TTTT
 categories: [Analysis Report]
 tags: [Windows Kernel]
 ---

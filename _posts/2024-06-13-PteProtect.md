@@ -1,5 +1,6 @@
 ---
 title: PTE 조작을 통해 실행코드 숨기기
+date: 2024-06-13 00:00:00 +/-TTTT
 categories: [Tech]
 tags: [Tech]
 ---

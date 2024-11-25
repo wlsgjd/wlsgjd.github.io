@@ -1,5 +1,6 @@
 ---
 title: 오브젝트 타입 변조 (ObjectType)
+date: 2023-11-10 00:00:00 +/-TTTT
 categories: [Analysis Report]
 tags: [Windows Kernel]
 ---

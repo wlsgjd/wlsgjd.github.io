@@ -1,5 +1,6 @@
 ---
 title: 물리 메모리 주소 변환
+date: 2024-05-23 00:00:00 +/-TTTT
 categories: [Windbg]
 tags: [Windbg]
 ---
