@@ -154,12 +154,12 @@ ntdll!_TEB
    +0x1010 ExtendedFeatureDisableMask : Uint8B
 ```
 
-EThread 에서는 HideFromDebugger라는 디버깅과 관련된 것으로 보이는 필드가 존재하여 확인해보니, 0x01으로 활성화 되어 있었습니다.
+EThread 에서는 HideFromDebugger라는 디버깅과 관련된 것으로 보이는 필드가 존재하여 확인해보니 0x01으로 활성화 되어 있었습니다.
 <br>임의로 생성된 스레드에서는 해당 기능이 비활성화 되어 있으며, 보호가 적용된 스레드에만 HideFromDebugger가 활성화 되어 있었습니다.
 ![](/assets/posts/2024-11-20-HideFromDebugger/4.png)
 
 ### NtSetInformationThread
-해당 기능에 대하여 조사해보니, HideFromDebugger는 NtSetInformationThread를 통해 호출가능한 안티디버깅 기능으로 확인되었습니다.
+해당 기능에 대하여 조사해보니 HideFromDebugger는 NtSetInformationThread를 통해 호출가능한 안티디버깅 기능으로 확인되었습니다.
 <br>문서화되지 않은 값, ThreadHideFromDebugger(0x11)를 전달하여 실행합니다.
 
 다음과 같이 실행하면 현재 스레드가 보호됩니다.
