@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>https://wlsgjd.github.io/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/categories/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/tags/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/archives/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/about/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/TEB/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/PEB/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/MmPhysicalMemoryBlock/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/HideFromDebugger/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/MDL/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/VAD/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/PteProtect/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/hyperV/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/pml4/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/ConvertingAddress/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/page2/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/tags/windows-internals/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/tags/windows-kernel/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/tags/pe/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/tags/windbg/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/tags/anti-debugging/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/tags/hyper-v/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/tags/tech/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/tags/tools/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/tags/windows/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/categories/analysis-report/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/categories/anti-debugging/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/categories/tech/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/categories/tools/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/categories/windbg/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/categories/windows-internals/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/HyperDbg/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/HideFile/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/PspProcessOpen/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/ProcessExiting/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/ObjectType/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/PspCidTable/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/EProtection/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/PEThread/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://wlsgjd.github.io/posts/CopyCert/</loc>
+  <lastmod>2024-12-01T15:03:08+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+
+
+</urlset>
