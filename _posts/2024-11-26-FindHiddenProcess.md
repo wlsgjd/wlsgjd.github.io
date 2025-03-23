@@ -1,8 +1,8 @@
 ---
 title: Find Hidden Process with windbg
 date: 2025-03-21 00:00:00 +/-TTTT
-categories: [Analysis Report]
-tags: [Windows Kernel]
+categories: [Windows Internals]
+tags: [Windows Internals]
 ---
 
 ## Rootkit
