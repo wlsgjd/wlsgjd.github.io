@@ -1,5 +1,5 @@
 ---
-title: Find Hidden Process with windbg
+title: Finding Hidden Processes with WinDbg
 date: 2025-03-21 00:00:00 +/-TTTT
 categories: [Windows Internals]
 tags: [Windows Internals]
