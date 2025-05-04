@@ -4,7 +4,7 @@ icon: fas fa-info-circle
 order: 4
 ---
 
-![](/assets/img/avatar.jpg)
+![](/assets/img/avatar5.gif)
 
 ## Profile
 - **Name**: *Jinhyeong, Choe* (1999.11.02)
