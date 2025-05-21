@@ -80,6 +80,7 @@ avatar: "/assets/img/avatar5.gif"
 # boolean type, the global switch for TOC in posts.
 toc: true
 
+# Skipping future date.
 future: true
 
 comments:
