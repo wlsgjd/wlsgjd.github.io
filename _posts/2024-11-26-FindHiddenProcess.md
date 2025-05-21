@@ -5,7 +5,7 @@ categories: [Windows Internals]
 tags: [Windows Internals]
 ---
 
-## Rootkit
+## Overview
 최근 발견되는 해킹툴 대부분은 루트킷 기능을 포함하고 있습니다.
 
 루트킷은 ActiveProcessLinks와 같은 커널 오브젝트를 수정하여 사용자로부터 프로세스를 숨기는 행위입니다.
