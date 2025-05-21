@@ -80,6 +80,8 @@ avatar: "/assets/img/avatar5.gif"
 # boolean type, the global switch for TOC in posts.
 toc: true
 
+future: true
+
 comments:
   active: 'giscus' # The global switch for posts comments, e.g., 'disqus'.  Keep it empty means disable
   # The active options are as follows:
