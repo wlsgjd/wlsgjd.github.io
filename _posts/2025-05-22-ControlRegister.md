@@ -14,7 +14,32 @@ tags: [Intel Architecture]
 
 ### CR0
 보호모드, 페이징, 캐시 등 프로세서의 기본적인 기능들을 제어합니다.  
-#### PG
+
+| Bit   | Name         | Description |
+|-------|--------------|-------------|
+| 0     | PE (Protection Enable) | 보호 모드 활성화 |
+| 1     | MP (Monitor Coprocessor) | x87 FPU 감시용 (TS와 연동) |
+| 2     | EM (Emulation) | FPU 명령어 에뮬레이션 (1 = FPU 비활성화) |
+| 3     | TS (Task Switched) | 태스크 전환 시 FPU 상태 저장 트리거 |
+| 4     | ET (Extension Type) | FPU 타입 식별용 (대부분 1로 고정) |
+| 5     | NE (Numeric Error) | FPU 예외를 `INT 16`으로 내부 처리 |
+| 16    | WP (Write Protect) | 커널 모드에서 read-only 페이지 보호 허용 |
+| 18    | AM (Alignment Mask) | 정렬 예외 활성화 (`CR4.AC` 필요) |
+| 29    | NW (Not Write-through) | 쓰기 동작 캐시 정책 제어 (write-through 금지) |
+| 30    | CD (Cache Disable) | CPU 캐시 비활성화 |
+| 31    | PG (Paging) | 페이징(가상 메모리 주소 변환) 활성화 |
+
+#### PG (Paging)
+페이징(가상 메모리 주소 변환)에 대한 활성화 여부입니다.  
+해당 값이 FALSE로 설정되면 모든 메모리는 물리 주소를 사용합니다.  
+
+#### CD (Cache Disable)
+#### NW (Not Write-through)
+#### AM (Alignment Mask)
+#### WP (Write Protect)
+#### NE (Numeric Error)
+#### ET (Extension Type)
+#### TS (Task Switched)
 
 ### CR1
 현재 사용되고 있지 않은은 예약된 값입니다.
@@ -60,6 +85,7 @@ VMX, PAE, PML5 등 프로세서의 확장된 기능들을 제어합니다.
 #### VMXE
 #### PAE
 #### LA57
+
 ```
 5.5 4-LEVEL PAGING AND 5-LEVEL PAGING
 Because the operation of 4-level paging and 5-level paging is very similar, they are described together in this
