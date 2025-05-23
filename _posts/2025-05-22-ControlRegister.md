@@ -18,9 +18,8 @@ tags: [Intel Architecture]
 ### CR2
 Page Fault가 발생한 메모리 주소를 나타냅니다. 페이지 폴트는 다음과 같은 경우에 발생합니다.  
 
-1. Access Violation  
+**1. Access Violation**  
 아래 예제에서는 NULL 주소에 엑세스하여 Page Fault가 발생합니다.  
-
 ```cpp
 int* addr_value = NULL;
 
@@ -28,10 +27,9 @@ int* addr_value = NULL;
 *addr_value = 123;
 ```
 
-2. Protection Violation  
+**2. Protection Violation**
 아래 예제에서는 READONLY 메모리에 write를 시도하여 Page Fault가 발생합니다.  
 ('static const' 키워드로 변수를 선언하면 .rdata 섹션에 매핑됨)  
-
 ```cpp
 static const value = 0; // .rdata (PAGE_READONLY)
 
