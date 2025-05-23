@@ -1,11 +1,11 @@
 ---
-title: Control Register
+title: Control Registers
 date: 2025-05-23 20:22:00 +0900
 categories: [Intel Architecture]
 tags: [Intel Architecture]
 ---
 
-## Control Register
+## Control Registers
 컨트롤 레지스터는 프로세서에 대한 상태, 정보, 설정을 나타냅니다.  
 ![](/assets/posts/2025-05-22-ControlRegister/1.png)
 
@@ -18,7 +18,7 @@ tags: [Intel Architecture]
 ### CR2
 Page Fault가 발생한 메모리 주소를 나타냅니다. 페이지 폴트는 다음과 같은 경우에 발생합니다.  
 
-1. Access Violation
+1. Access Violation  
 아래 예제에서는 NULL 주소에 엑세스하여 Page Fault가 발생합니다.  
 ```cpp
 int* addr_value = NULL;
