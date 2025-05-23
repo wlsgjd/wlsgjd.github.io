@@ -27,7 +27,7 @@ int* addr_value = NULL;
 *addr_value = 123;
 ```
 
-**2. Protection Violation**
+**2. Protection Violation**  
 아래 예제에서는 READONLY 메모리에 write를 시도하여 Page Fault가 발생합니다.  
 ('static const' 키워드로 변수를 선언하면 .rdata 섹션에 매핑됨)  
 ```cpp
