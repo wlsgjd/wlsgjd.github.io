@@ -5,11 +5,15 @@ categories: [Intel Architecture]
 tags: [Intel Architecture]
 ---
 
+작성중 ~
+
 ## Control Registers
-컨트롤 레지스터는 프로세서에 대한 상태, 정보, 설정을 나타냅니다.  
+컨트롤 레지스터는 프로세서에 대한 상태, 정보, 설정 등 여러가지를 나타냅니다.  
+전체적인 이미지는 다음과 같습니다.  
 ![](/assets/posts/2025-05-22-ControlRegister/1.png)
 
 ### CR0
+보호모드, 페이징, 캐시 등 프로세서의 기본적인 기능들을 제어합니다.  
 #### PG
 
 ### CR1
@@ -39,7 +43,7 @@ value = 123;
 
 ### CR3
 DirectoryTableBase의 물리 메모리 주소를 나타냅니다. DirBase를 통해 가상 메모리 주소를 물리 메모리 주소로 변환합니다.  
-CR4.LA57 설정에 따라 PML4 또는 PML5 페이징 방식이 사용됩니다.  
+CR4.LA57 설정에 따라 PML4 또는 PML5 페이징 방식이 적용됩니다.  
 
 해당 값은 PCB->DirectoryTableBase 값과 동일합니다.  
 ```
@@ -52,6 +56,7 @@ nt!_EPROCESS
 ```
 
 ### CR4
+VMX, PAE, PML5 등 프로세서의 확장된 기능들을 제어합니다.  
 #### VMXE
 #### PAE
 #### LA57
