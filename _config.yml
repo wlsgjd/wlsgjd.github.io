@@ -16,7 +16,7 @@ timezone:
 
 title: "wlsgjd" # the main title
 
-tagline: Anti-Cheat Reverse Engineer. # it will display as the sub-title
+tagline: Reverse Engineer # it will display as the sub-title
 
 description: >- # used by seo meta and the atom feed
   wlsgjd
@@ -30,8 +30,7 @@ plugins:
 github:
   username: wlsgjd # change to your github username
 
-twitter:
-  username: # change to your twitter username
+twitter: false
 
 social:
   # Change to your full name.
