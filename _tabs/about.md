@@ -4,7 +4,7 @@ icon: fas fa-info-circle
 order: 4
 ---
 
-![](/assets/img/avatar5.gif)
+![](/assets/img/avatar6.gif)
 
 ## Profile
 - **Name**: Jinhyeong Choe
