@@ -164,28 +164,28 @@ fffff801`50d5f2fd c3              ret
 [kdmapper](https://github.com/TheCruZ/kdmapper)는 이를 이용하여 MmUnloadedDrivers에 기록되지 않도록 길이와 버퍼를 제거한다.
 ```cpp
 // https://github.com/TheCruZ/kdmapper/blob/280f65733d6469cfdae9dff76f24793d90f1f672/kdmapper/intel_driver.cpp#L834-L855
-	UNICODE_STRING us_driver_base_dll_name = { 0 };
+UNICODE_STRING us_driver_base_dll_name = { 0 };
 
-	if (!ReadMemory(driver_section + 0x58, &us_driver_base_dll_name, sizeof(us_driver_base_dll_name)) || us_driver_base_dll_name.Length == 0) {
-		kdmLog(L"[!] Failed to find driver name" << std::endl);
-		return false;
-	}
+if (!ReadMemory(driver_section + 0x58, &us_driver_base_dll_name, sizeof(us_driver_base_dll_name)) || us_driver_base_dll_name.Length == 0) {
+    kdmLog(L"[!] Failed to find driver name" << std::endl);
+    return false;
+}
 
-	auto unloadedName = std::make_unique<wchar_t[]>((ULONG64)us_driver_base_dll_name.Length / 2ULL + 1ULL);
-	if (!ReadMemory((uintptr_t)us_driver_base_dll_name.Buffer, unloadedName.get(), us_driver_base_dll_name.Length)) {
-		kdmLog(L"[!] Failed to read driver name" << std::endl);
-		return false;
-	}
+auto unloadedName = std::make_unique<wchar_t[]>((ULONG64)us_driver_base_dll_name.Length / 2ULL + 1ULL);
+if (!ReadMemory((uintptr_t)us_driver_base_dll_name.Buffer, unloadedName.get(), us_driver_base_dll_name.Length)) {
+    kdmLog(L"[!] Failed to read driver name" << std::endl);
+    return false;
+}
 
-	us_driver_base_dll_name.Length = 0; //MiRememberUnloadedDriver will check if the length > 0 to save the unloaded driver
+us_driver_base_dll_name.Length = 0; //MiRememberUnloadedDriver will check if the length > 0 to save the unloaded driver
 
-	if (!WriteMemory(driver_section + 0x58, &us_driver_base_dll_name, sizeof(us_driver_base_dll_name))) {
-		kdmLog(L"[!] Failed to write driver name length" << std::endl);
-		return false;
-	}
+if (!WriteMemory(driver_section + 0x58, &us_driver_base_dll_name, sizeof(us_driver_base_dll_name))) {
+    kdmLog(L"[!] Failed to write driver name length" << std::endl);
+    return false;
+}
 
-	kdmLog(L"[+] MmUnloadedDrivers Cleaned: " << unloadedName << std::endl);
-	return true;
+kdmLog(L"[+] MmUnloadedDrivers Cleaned: " << unloadedName << std::endl);
+return true;
 ```
 
 ## PiDDBCache
@@ -253,40 +253,40 @@ ffff830d`e6d5b940  "Wdf01000.sys"
 kdmapper는 각 요소에 대한 데이터를 모두 제거한다.
 ```cpp
 // https://github.com/TheCruZ/kdmapper/blob/280f65733d6469cfdae9dff76f24793d90f1f672/kdmapper/intel_driver.cpp#L1027
-	// first, unlink from the list
-	PLIST_ENTRY prev;
-	if (!ReadMemory((uintptr_t)pFoundEntry + (offsetof(struct nt::_PiDDBCacheEntry, List.Blink)), &prev, sizeof(_LIST_ENTRY*))) {
-		kdmLog(L"[-] Can't get prev entry" << std::endl);
-		ExReleaseResourceLite(PiDDBLock);
-		return false;
-	}
-	PLIST_ENTRY next;
-	if (!ReadMemory((uintptr_t)pFoundEntry + (offsetof(struct nt::_PiDDBCacheEntry, List.Flink)), &next, sizeof(_LIST_ENTRY*))) {
-		kdmLog(L"[-] Can't get next entry" << std::endl);
-		ExReleaseResourceLite(PiDDBLock);
-		return false;
-	}
+// first, unlink from the list
+PLIST_ENTRY prev;
+if (!ReadMemory((uintptr_t)pFoundEntry + (offsetof(struct nt::_PiDDBCacheEntry, List.Blink)), &prev, sizeof(_LIST_ENTRY*))) {
+    kdmLog(L"[-] Can't get prev entry" << std::endl);
+    ExReleaseResourceLite(PiDDBLock);
+    return false;
+}
+PLIST_ENTRY next;
+if (!ReadMemory((uintptr_t)pFoundEntry + (offsetof(struct nt::_PiDDBCacheEntry, List.Flink)), &next, sizeof(_LIST_ENTRY*))) {
+    kdmLog(L"[-] Can't get next entry" << std::endl);
+    ExReleaseResourceLite(PiDDBLock);
+    return false;
+}
 
-	kdmLog("[+] Found Table Entry = 0x" << std::hex << pFoundEntry << std::endl);
+kdmLog("[+] Found Table Entry = 0x" << std::hex << pFoundEntry << std::endl);
 
-	if (!WriteMemory((uintptr_t)prev + (offsetof(struct _LIST_ENTRY, Flink)), &next, sizeof(_LIST_ENTRY*))) {
-		kdmLog(L"[-] Can't set next entry" << std::endl);
-		ExReleaseResourceLite(PiDDBLock);
-		return false;
-	}
-	if (!WriteMemory((uintptr_t)next + (offsetof(struct _LIST_ENTRY, Blink)), &prev, sizeof(_LIST_ENTRY*))) {
-		kdmLog(L"[-] Can't set prev entry" << std::endl);
-		ExReleaseResourceLite(PiDDBLock);
-		return false;
-	}
+if (!WriteMemory((uintptr_t)prev + (offsetof(struct _LIST_ENTRY, Flink)), &next, sizeof(_LIST_ENTRY*))) {
+    kdmLog(L"[-] Can't set next entry" << std::endl);
+    ExReleaseResourceLite(PiDDBLock);
+    return false;
+}
+if (!WriteMemory((uintptr_t)next + (offsetof(struct _LIST_ENTRY, Blink)), &prev, sizeof(_LIST_ENTRY*))) {
+    kdmLog(L"[-] Can't set prev entry" << std::endl);
+    ExReleaseResourceLite(PiDDBLock);
+    return false;
+}
 ```
 ```cpp
-	// then delete the element from the avl table
-	if (!RtlDeleteElementGenericTableAvl(PiDDBCacheTable, pFoundEntry)) {
-		kdmLog(L"[-] Can't delete from PiDDBCacheTable" << std::endl);
-		ExReleaseResourceLite(PiDDBLock);
-		return false;
-	}
+// then delete the element from the avl table
+if (!RtlDeleteElementGenericTableAvl(PiDDBCacheTable, pFoundEntry)) {
+    kdmLog(L"[-] Can't delete from PiDDBCacheTable" << std::endl);
+    ExReleaseResourceLite(PiDDBLock);
+    return false;
+}
 ```
 
 ## KernelHashBucketList
@@ -329,12 +329,12 @@ fffff801`53c7e906 eb4c            jmp     CI!I_SetSecurityState+0xac (fffff801`5
 
 g_KernelHashBucketList에는 <code>_HashBucketEntry</code>이 리스트 구조로 기록된다.
 ```cpp
-	typedef struct _HashBucketEntry
-	{
-		struct _HashBucketEntry* Next;
-		UNICODE_STRING DriverName;
-		ULONG CertHash[5];
-	} HashBucketEntry, * PHashBucketEntry;
+typedef struct _HashBucketEntry
+{
+    struct _HashBucketEntry* Next;
+    UNICODE_STRING DriverName;
+    ULONG CertHash[5];
+} HashBucketEntry, * PHashBucketEntry;
 ```
 
 windbg를 통해 확인해보면 다음과 같다. 드라이버 경로와 인증서 관련 해시가 기록되는 것으로 보인다.
@@ -356,25 +356,25 @@ kdmapper에서는 리스트 내에서 대상과 일치하는 드라이버를 찾
 ```cpp
 // https://github.com/TheCruZ/kdmapper/blob/280f65733d6469cfdae9dff76f24793d90f1f672/kdmapper/intel_driver.cpp#L1232-L1250
 
-			size_t find_result = std::wstring(wsName.get()).find(wdname);
-			if (find_result != std::wstring::npos) {
-				kdmLog(L"[+] Found In g_KernelHashBucketList: " << std::wstring(&wsName[find_result]) << std::endl);
-				nt::HashBucketEntry* Next = 0;
-				if (!ReadMemory((uintptr_t)entry, &Next, sizeof(Next))) {
-					kdmLog(L"[-] Failed to read g_KernelHashBucketList next entry ptr!" << std::endl);
-					if (!ExReleaseResourceLite(g_HashCacheLock)) {
-						kdmLog(L"[-] Failed to release g_KernelHashBucketList lock!" << std::endl);
-					}
-					return false;
-				}
+size_t find_result = std::wstring(wsName.get()).find(wdname);
+if (find_result != std::wstring::npos) {
+    kdmLog(L"[+] Found In g_KernelHashBucketList: " << std::wstring(&wsName[find_result]) << std::endl);
+    nt::HashBucketEntry* Next = 0;
+    if (!ReadMemory((uintptr_t)entry, &Next, sizeof(Next))) {
+        kdmLog(L"[-] Failed to read g_KernelHashBucketList next entry ptr!" << std::endl);
+        if (!ExReleaseResourceLite(g_HashCacheLock)) {
+            kdmLog(L"[-] Failed to release g_KernelHashBucketList lock!" << std::endl);
+        }
+        return false;
+    }
 
-				if (!WriteMemory((uintptr_t)prev, &Next, sizeof(Next))) {
-					kdmLog(L"[-] Failed to write g_KernelHashBucketList prev entry ptr!" << std::endl);
-					if (!ExReleaseResourceLite(g_HashCacheLock)) {
-						kdmLog(L"[-] Failed to release g_KernelHashBucketList lock!" << std::endl);
-					}
-					return false;
-				}
+    if (!WriteMemory((uintptr_t)prev, &Next, sizeof(Next))) {
+        kdmLog(L"[-] Failed to write g_KernelHashBucketList prev entry ptr!" << std::endl);
+        if (!ExReleaseResourceLite(g_HashCacheLock)) {
+            kdmLog(L"[-] Failed to release g_KernelHashBucketList lock!" << std::endl);
+        }
+        return false;
+    }
 ```
 ## WdFilterDriverList
 WdFilterDriverList은 Windows Defender에서 사용하는 드라이버 목록입니다. <br>일부 안티치트에서 해당 리스트를 통해 탐지하고 있는 것으로 알려져 있습니다.
@@ -390,94 +390,92 @@ From here they parse DriverInfoList to find all vulnerable drivers loaded / unlo
 ```cpp
 // https://github.com/TheCruZ/kdmapper/blob/280f65733d6469cfdae9dff76f24793d90f1f672/kdmapper/intel_driver.cpp#L258-L286
 
-	// MpCleanupDriverInfo->MpFreeDriverInfoEx
-	// The pattern only focus in the 0x8 offset and the possibility of the different order for the instructions
-	/*
-		49 8B C9                      mov     rcx, r9         ; P
-		49 89 50 08                   mov     [r8+8], rdx
-		E8 FB F0 FD FF                call    MpFreeDriverInfoEx
-		48 8B 0D FC AA FA FF          mov     rcx, cs:qword_1C0021BF0
-		E9 21 FF FF FF                jmp     loc_1C007701A
-	*/
-	auto MpFreeDriverInfoExRef = FindPatternInSectionAtKernel("PAGE", WdFilter, (PUCHAR)"\x89\x00\x08\xE8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xE9", "x?xx???????????x");
-	if (!MpFreeDriverInfoExRef) {
-		/*
-			48 89 4A 08                   mov     [rdx+8], rcx
-			49 8B C8                      mov     rcx, r8         ; P
-			E8 C3 58 FE FF                call    sub_1C0065308
-			48 8B 0D 44 41 FA FF          mov     rcx, cs:qword_1C0023B90
-			E9 39 FF FF FF                jmp     loc_1C007F98A
-		*/
-		MpFreeDriverInfoExRef = FindPatternInSectionAtKernel("PAGE", WdFilter, (PUCHAR)"\x89\x00\x08\x00\x00\x00\xE8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xE9", "x?x???x???????????x");
-		if (!MpFreeDriverInfoExRef) {
-			kdmLog("[!] Failed to find WdFilter MpFreeDriverInfoEx" << std::endl);
-			return false;
-		}
-		else {
-			kdmLog("[+] Found WdFilter MpFreeDriverInfoEx with second pattern" << std::endl);
-		}
-		MpFreeDriverInfoExRef += 0x3; // adjust for next sum offset
-	}
+// MpCleanupDriverInfo->MpFreeDriverInfoEx
+// The pattern only focus in the 0x8 offset and the possibility of the different order for the instructions
+/*
+    49 8B C9                      mov     rcx, r9         ; P
+    49 89 50 08                   mov     [r8+8], rdx
+    E8 FB F0 FD FF                call    MpFreeDriverInfoEx
+    48 8B 0D FC AA FA FF          mov     rcx, cs:qword_1C0021BF0
+    E9 21 FF FF FF                jmp     loc_1C007701A
+*/
+auto MpFreeDriverInfoExRef = FindPatternInSectionAtKernel("PAGE", WdFilter, (PUCHAR)"\x89\x00\x08\xE8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xE9", "x?xx???????????x");
+if (!MpFreeDriverInfoExRef) {
+    /*
+        48 89 4A 08                   mov     [rdx+8], rcx
+        49 8B C8                      mov     rcx, r8         ; P
+        E8 C3 58 FE FF                call    sub_1C0065308
+        48 8B 0D 44 41 FA FF          mov     rcx, cs:qword_1C0023B90
+        E9 39 FF FF FF                jmp     loc_1C007F98A
+    */
+    MpFreeDriverInfoExRef = FindPatternInSectionAtKernel("PAGE", WdFilter, (PUCHAR)"\x89\x00\x08\x00\x00\x00\xE8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xE9", "x?x???x???????????x");
+    if (!MpFreeDriverInfoExRef) {
+        kdmLog("[!] Failed to find WdFilter MpFreeDriverInfoEx" << std::endl);
+        return false;
+    }
+    else {
+        kdmLog("[+] Found WdFilter MpFreeDriverInfoEx with second pattern" << std::endl);
+    }
+    MpFreeDriverInfoExRef += 0x3; // adjust for next sum offset
+}
 ```
 
 kdmapper 코드를 살펴보면 리스트 내 연결을 끊고, RuntimeDriversCount를 조작하고, 배열 메모리를 조작하고, 관련 메모리도 해제하고... 다양하게 조지고 있습니다. ㅎ호
 ```cpp
 // https://github.com/TheCruZ/kdmapper/blob/280f65733d6469cfdae9dff76f24793d90f1f672/kdmapper/intel_driver.cpp#L327-L336
-					if (!removedRuntimeDriversArray) {
-						kdmLog("[!] Failed to remove from RuntimeDriversArray" << std::endl);
-						return false;
-					}
+if (!removedRuntimeDriversArray) {
+    kdmLog("[!] Failed to remove from RuntimeDriversArray" << std::endl);
+    return false;
+}
 
-					auto NextEntry = ReadListEntry(uintptr_t(Entry) + (offsetof(struct _LIST_ENTRY, Flink)));
-					auto PrevEntry = ReadListEntry(uintptr_t(Entry) + (offsetof(struct _LIST_ENTRY, Blink)));
+auto NextEntry = ReadListEntry(uintptr_t(Entry) + (offsetof(struct _LIST_ENTRY, Flink)));
+auto PrevEntry = ReadListEntry(uintptr_t(Entry) + (offsetof(struct _LIST_ENTRY, Blink)));
 
-					WriteMemory(uintptr_t(NextEntry) + (offsetof(struct _LIST_ENTRY, Blink)), &PrevEntry, sizeof(LIST_ENTRY::Blink));
-					WriteMemory(uintptr_t(PrevEntry) + (offsetof(struct _LIST_ENTRY, Flink)), &NextEntry, sizeof(LIST_ENTRY::Flink));
+WriteMemory(uintptr_t(NextEntry) + (offsetof(struct _LIST_ENTRY, Blink)), &PrevEntry, sizeof(LIST_ENTRY::Blink));
+WriteMemory(uintptr_t(PrevEntry) + (offsetof(struct _LIST_ENTRY, Flink)), &NextEntry, sizeof(LIST_ENTRY::Flink));
 ```
 ```cpp
 // https://github.com/TheCruZ/kdmapper/blob/280f65733d6469cfdae9dff76f24793d90f1f672/kdmapper/intel_driver.cpp#L313-L325
-					//remove from RuntimeDriversArray
-					bool removedRuntimeDriversArray = false;
-					PVOID SameIndexList = (PVOID)((uintptr_t)Entry - 0x10);
-					for (int k = 0; k < 256; k++) { // max RuntimeDriversArray elements
-						PVOID value = 0;
-						ReadMemory(RuntimeDriversArray + (k * 8), &value, sizeof(PVOID));
-						if (value == SameIndexList) {
-							PVOID emptyval = (PVOID)(RuntimeDriversCount + 1); // this is not count+1 is position of cout addr+1
-							WriteMemory(RuntimeDriversArray + (k * 8), &emptyval, sizeof(PVOID));
-							removedRuntimeDriversArray = true;
-							break;
-						}
-					}
+//remove from RuntimeDriversArray
+bool removedRuntimeDriversArray = false;
+PVOID SameIndexList = (PVOID)((uintptr_t)Entry - 0x10);
+for (int k = 0; k < 256; k++) { // max RuntimeDriversArray elements
+    PVOID value = 0;
+    ReadMemory(RuntimeDriversArray + (k * 8), &value, sizeof(PVOID));
+    if (value == SameIndexList) {
+        PVOID emptyval = (PVOID)(RuntimeDriversCount + 1); // this is not count+1 is position of cout addr+1
+        WriteMemory(RuntimeDriversArray + (k * 8), &emptyval, sizeof(PVOID));
+        removedRuntimeDriversArray = true;
+        break;
+    }
+}
 ```
 ```cpp
 // https://github.com/TheCruZ/kdmapper/blob/280f65733d6469cfdae9dff76f24793d90f1f672/kdmapper/intel_driver.cpp#L338-L342
-					// decrement RuntimeDriversCount
-					ULONG current = 0;
-					ReadMemory(RuntimeDriversCount, &current, sizeof(ULONG));
-					current--;
-					WriteMemory(RuntimeDriversCount, &current, sizeof(ULONG));
+// decrement RuntimeDriversCount
+ULONG current = 0;
+ReadMemory(RuntimeDriversCount, &current, sizeof(ULONG));
+current--;
+WriteMemory(RuntimeDriversCount, &current, sizeof(ULONG));
 ```
 ```cpp
 // https://github.com/TheCruZ/kdmapper/blob/280f65733d6469cfdae9dff76f24793d90f1f672/kdmapper/intel_driver.cpp#L344-L355
-					// call MpFreeDriverInfoEx
-					uintptr_t DriverInfo = (uintptr_t)Entry - 0x20;
+// call MpFreeDriverInfoEx
+uintptr_t DriverInfo = (uintptr_t)Entry - 0x20;
 
-					//verify DriverInfo Magic
-					USHORT Magic = 0;
-					ReadMemory(DriverInfo, &Magic, sizeof(USHORT));
-					if (Magic != 0xDA18) {
-						kdmLog("[!] DriverInfo Magic is invalid, new wdfilter version?, driver info will not be released to prevent bsod" << std::endl);
-					}
-					else {
-						CallKernelFunction<void>(nullptr, MpFreeDriverInfoEx, DriverInfo);
-					}
+//verify DriverInfo Magic
+USHORT Magic = 0;
+ReadMemory(DriverInfo, &Magic, sizeof(USHORT));
+if (Magic != 0xDA18) {
+    kdmLog("[!] DriverInfo Magic is invalid, new wdfilter version?, driver info will not be released to prevent bsod" << std::endl);
+}
+else {
+    CallKernelFunction<void>(nullptr, MpFreeDriverInfoEx, DriverInfo);
+}
 
-					kdmLog("[+] WdFilterDriverList Cleaned: " << ImageName << std::endl);
+kdmLog("[+] WdFilterDriverList Cleaned: " << ImageName << std::endl);
 ```
 
-
-
 ## References
-- https://github.com/TheCruZ/kdmapper
-- https://www.unknowncheats.me/forum/anti-cheat-bypass/509917-eac-taking-advantage-wdfilter-driver.html
+- [https://github.com/TheCruZ/kdmapper](https://github.com/TheCruZ/kdmapper)
+- [https://www.unknowncheats.me/forum/anti-cheat-bypass/509917-eac-taking-advantage-wdfilter-driver.html](https://www.unknowncheats.me/forum/anti-cheat-bypass/509917-eac-taking-advantage-wdfilter-driver.html)
