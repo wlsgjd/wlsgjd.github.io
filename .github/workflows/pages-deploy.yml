@@ -50,6 +50,11 @@ jobs:
         env:
           JEKYLL_ENV: "production"
 
+      - name: Rename sitemap
+        run: |
+          mv "_site${{ steps.pages.outputs.base_path }}/sitemap.xml" \
+             "_site${{ steps.pages.outputs.base_path }}/site-map.xml"
+
       - name: Test site
         run: |
           bundle exec htmlproofer _site \
