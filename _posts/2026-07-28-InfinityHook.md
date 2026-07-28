@@ -5,12 +5,12 @@ categories: [Windows Internals]
 tags: [Windows Internals]
 ---
 
-# ETW (Event Tracing for Windows)
+## ETW (Event Tracing for Windows)
 윈도우 운영체제에는 커널 또는 애플리케이션에서 발생한 이벤트를 추적할 수 있는 **ETW (Event Tracing for Windows)** 라는 기능이 존재합니다.
 **Infinity Hook**은 ETW 시스템 내에서 호출되는 함수를 후킹하여 시스템 콜을 가로채는 오픈소스 도구입니다.
 ![](/assets/posts/2026-07-28-InfinityHook/hiding_file.gif)
 
-# EtwpDebuggerData
+## EtwpDebuggerData
 후킹에 있어 가장 먼저 찾아야 하는 데이터입니다. **ntoskrnl** 이미지 영역 내 <code>2C 08 04 38 0C</code> 시그니처 검색을 통해 찾을 수 있습니다.
 검색된 주소 **-0x02** 위치가 **EtwpDebuggerData** 에 해당됩니다.
 ```
@@ -25,14 +25,14 @@ Set bu breakpoint
 Exact matches:
 ```
 
-## EtwpDebuggerDataSilo
+### EtwpDebuggerDataSilo
 **EtwpDebuggerData + 0x10** 위치에 함수 테이블 <code>EtwpDebuggerDataSilo</code>이 존재합니다.
 ```
 2: kd> dq EtwpDebuggerData + 0x10
 fffff807`6e010e48  ffffd98c`2790ac40 // EtwpDebuggerDataSilo[]
 ```
 
-### CkclWmiLoggerContext
+#### CkclWmiLoggerContext
 **EtwpDebuggerDataSilo + 0x10** 위치에는 <code>nt!_WMI_LOGGER_CONTEXT</code> 구조를 가진 **CkclWmiLoggerContext**이 존재합니다.
 ```
 2: kd> dq ffffd98c`2790ac40+0x10
@@ -54,7 +54,7 @@ nt!_WMI_LOGGER_CONTEXT
    +0x028 GetCpuClock      : 3
 ```
 
-# InfinityHook
+## InfinityHook
 [InfinityHook](https://github.com/everdox/InfinityHook)은 **Windows 7** 부터 **Windows 10 (Build 18363)** 까지 지원합니다.
 해당 버전 커널에서는 **GetCpuClock**가 함수 포인터로 사용됩니다. 이를 조작하여 후킹 코드를 실행합니다.
 ```c
@@ -67,7 +67,7 @@ nt!_WMI_LOGGER_CONTEXT
     }
 ```
 
-# InfinityHookPro (Windows 10 Version 1909, Build 18363+)
+## InfinityHookPro (Windows 10 Version 1909, Build 18363+)
 [InfinityHookPro](https://github.com/i1tao/InfinityHookProLib)는 **Windows 10 (Build 19041)** 부터 **최신 버전 윈도우 (Windows 11)** 까지 지원합니다.
 
 해당 버전 커널에서는 더 이상 **GetCpuClock** 가 함수 포인터로 사용되지 않고, 인덱스 값으로 사용됩니다.
@@ -98,7 +98,7 @@ fffff804`0d42c45e 83e801          sub     eax,1
 fffff804`0d42c461 0f85b1ca1f00    jne     nt!EtwpGetLoggerTimeStamp+0x1fcad0 (fffff804`0d628f18)
 ```
 
-## [0x02] nt!HalpTimerQueryHostPerformanceCounter
+### [0x02] nt!HalpTimerQueryHostPerformanceCounter
 **InfinityHookPro** 에서는 **GetCpuClock**  값을 **0x02** 로 변경하고 있습니다.
 ```c
         *ctx->GetCpuClock = (PVOID)2;
@@ -195,7 +195,7 @@ fffff804`0d6b69ba 742c            je      nt!HalpTimerQueryHostPerformanceCounte
 fffff804`0de4a398  fffff806`18307d40 0Ab5dgbQCYlbeUuu+0x7d40
 ```
 
-# References
+## References
 - [GitHub - InfinityHook](https://github.com/everdox/InfinityHook)
 - [GitHub - InfinityHookProLib](https://github.com/i1tao/InfinityHookProLib)
 - [Windows 10 19041版本的Infinity hook 原理](https://www.anquanke.com/post/id/206288)
