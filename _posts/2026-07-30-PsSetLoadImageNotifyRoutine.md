@@ -6,7 +6,7 @@ tags: [Windows Internals]
 ---
 
 ## PsSetLoadImageNotifyRoutine
-**PsSetLoadImageNotifyRoutine**은 이미지가 로드될 때 호출되는 콜백 루틴을 등록합니다.<br>등록된 콜백은 <code>EntryPoint</code> 코드보다 우선적으로 실행됩니다.
+**PsSetLoadImageNotifyRoutine**은 이미지가 로드될 때 호출되는 콜백 루틴을 등록합니다.<br>등록된 콜백은 엔트리 코드가 실행되기 전 호출됩니다.
 ```c
 NTSTATUS PsSetLoadImageNotifyRoutine(
   [in] PLOAD_IMAGE_NOTIFY_ROUTINE NotifyRoutine
