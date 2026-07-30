@@ -23,6 +23,7 @@ VOID PloadImageNotifyRoutine(
 {...}
 ```
 
+### PspLoadImageNotifyRoutine
 **PsSetLoadImageNotifyRoutineEx** 함수 내부에서는 **PspLoadImageNotifyRoutine** 라는 내부 콜백 리스트를 참조합니다.
 ```
 nt!PsSetLoadImageNotifyRoutineEx:
@@ -47,6 +48,7 @@ ffffb502`33d917a0  00000000`00000020
 ffffb502`33d917a8  fffff804`81044764 driver.sys+4767
 ```
 
+### PspLoadImageNotifyRoutineCount
 **PsSetLoadImageNotifyRoutine**를 통해 등록된 콜백의 개수는 **PspLoadImageNotifyRoutineCount**를 통해서도 확인이 가능합니다.
 ```
 nt!PsSetLoadImageNotifyRoutineEx+0x5f:

@@ -63,6 +63,7 @@ nt!_OBJECT_TYPE
    +0x0c8 CallbackList     : _LIST_ENTRY [ 0xffffda80`6d796870 - 0xffffda80`71c3e510 ]
 ```
 
+### _OB_OPERATION_REGISTRATION
 **CallbackList**는 <code>_LIST_ENTRY</code> 구조이며 <code>+0x28</code> 위치에 **PreOperation**, <code>+0x30</code> 위치에 **PostOperation** 콜백 함수가 존재합니다.<br>해당 위치는 패치가드에 트리거 되지 않아 일부 해킹툴에서 콜백을 조작하여 핸들 보호를 우회하기도 합니다.
 ```c
 typedef struct _OB_OPERATION_REGISTRATION {
